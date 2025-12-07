@@ -1,0 +1,23 @@
+{
+  "short_name": "Dolce Vita",
+  "name": "Dolce Vita 義式旅人",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3203/3203071.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3203/3203071.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "background_color": "#FEFBF6",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#FEFBF6",
+  "description": "義大利旅遊規劃與記帳助手"
+}

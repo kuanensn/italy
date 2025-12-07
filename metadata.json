@@ -1,0 +1,7 @@
+{
+  "name": "Dolce Vita Travel",
+  "description": "一款義大利風格、手機優先的旅遊規劃應用程式，由 Gemini 提供支援。具備行程管理、AI 導遊觀點、天氣整合以及旅遊工具。",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
