@@ -1,3 +1,4 @@
+
 import { Trip, ItineraryType } from "../types";
 
 export const initialTripData: Trip = {
@@ -10,7 +11,15 @@ export const initialTripData: Trip = {
       day: 1,
       date: "12/21 (日)",
       location: "桃園 -> 上海",
-      weather: { temp: "15°C", condition: "多雲", icon: "☁️" },
+      weather: { 
+        temp: "15°C", 
+        condition: "多雲", 
+        icon: "☁️",
+        rainProb: "10%",
+        uvIndex: "低 (2)",
+        outfitAdvice: "舒適輕便的長袖衣物，適合長時間飛行。",
+        sunProtection: "無須特別防曬。"
+      },
       items: [
         {
           id: "d1-1",
@@ -35,7 +44,15 @@ export const initialTripData: Trip = {
       day: 2,
       date: "12/22 (一)",
       location: "上海 -> 米蘭 -> 西西里島",
-      weather: { temp: "14°C", condition: "晴朗", icon: "☀️" },
+      weather: { 
+        temp: "14°C", 
+        condition: "晴朗", 
+        icon: "☀️",
+        rainProb: "0%",
+        uvIndex: "中 (4)",
+        outfitAdvice: "西西里島陽光充足但風大，建議穿著防風外套搭配太陽眼鏡。",
+        sunProtection: "建議塗抹 SPF30 防曬乳。"
+      },
       items: [
         {
           id: "d2-1",
@@ -71,7 +88,15 @@ export const initialTripData: Trip = {
       day: 3,
       date: "12/23 (二)",
       location: "西西里島 (巴勒莫)",
-      weather: { temp: "16°C", condition: "晴時多雲", icon: "⛅" },
+      weather: { 
+        temp: "16°C", 
+        condition: "晴時多雲", 
+        icon: "⛅",
+        rainProb: "20%",
+        uvIndex: "中 (3)",
+        outfitAdvice: "適合洋蔥式穿搭，早晚溫差大，帶一件輕薄羽絨或羊毛衫。",
+        sunProtection: "外出時建議佩戴帽子。"
+      },
       items: [
         {
           id: "d3-1",
@@ -100,7 +125,15 @@ export const initialTripData: Trip = {
       day: 4,
       date: "12/24 (三)",
       location: "切法盧 (Cefalù)",
-      weather: { temp: "15°C", condition: "晴朗", icon: "☀️" },
+      weather: { 
+        temp: "15°C", 
+        condition: "晴朗", 
+        icon: "☀️",
+        rainProb: "0%",
+        uvIndex: "中 (4)",
+        outfitAdvice: "海邊風大，建議穿著防風外套，若要攀登巨岩請穿好走的鞋子。",
+        sunProtection: "海邊紫外線反射強，請補擦防曬。"
+      },
       items: [
         {
           id: "d4-1",
@@ -133,7 +166,15 @@ export const initialTripData: Trip = {
       day: 5,
       date: "12/25 (四)",
       location: "西西里 -> 那不勒斯",
-      weather: { temp: "13°C", condition: "多雲", icon: "☁️" },
+      weather: { 
+        temp: "13°C", 
+        condition: "多雲", 
+        icon: "☁️",
+        rainProb: "30%",
+        uvIndex: "低 (2)",
+        outfitAdvice: "移動日建議穿著舒適。那不勒斯可能會飄雨，建議攜帶折疊傘。",
+        sunProtection: "基本保濕防曬即可。"
+      },
       items: [
         {
           id: "d5-1",
@@ -164,7 +205,15 @@ export const initialTripData: Trip = {
       day: 6,
       date: "12/26 (五)",
       location: "龐貝 & 維蘇威火山",
-      weather: { temp: "12°C", condition: "晴", icon: "☀️" },
+      weather: { 
+        temp: "12°C", 
+        condition: "晴", 
+        icon: "☀️",
+        rainProb: "10%",
+        uvIndex: "中 (4)",
+        outfitAdvice: "火山區域完全無遮蔽，務必戴帽子。路面不平，請穿著防滑運動鞋。",
+        sunProtection: "高強度防曬，建議每兩小時補擦。"
+      },
       items: [
         {
           id: "d6-1",
@@ -182,7 +231,15 @@ export const initialTripData: Trip = {
       day: 7,
       date: "12/27 (六)",
       location: "那不勒斯 -> 巴里 -> 蘑菇村",
-      weather: { temp: "11°C", condition: "陰", icon: "☁️" },
+      weather: { 
+        temp: "11°C", 
+        condition: "陰", 
+        icon: "☁️",
+        rainProb: "40%",
+        uvIndex: "低 (1)",
+        outfitAdvice: "普利亞地區冬天較為濕冷，建議穿著保暖大衣與防水鞋。",
+        sunProtection: "陰天仍有紫外線，建議塗抹輕薄防曬。"
+      },
       items: [
         {
           id: "d7-1",
@@ -211,7 +268,15 @@ export const initialTripData: Trip = {
       day: 8,
       date: "12/28 (日)",
       location: "巴里 -> 羅馬",
-      weather: { temp: "10°C", condition: "雨", icon: "🌧️" },
+      weather: { 
+        temp: "10°C", 
+        condition: "雨", 
+        icon: "🌧️",
+        rainProb: "80%",
+        uvIndex: "低 (1)",
+        outfitAdvice: "羅馬雨天機率高，務必攜帶堅固的雨傘與穿著防水外套。古蹟石頭路濕滑請小心。",
+        sunProtection: "無須特別防曬。"
+      },
       items: [
         {
           id: "d8-1",
@@ -238,7 +303,15 @@ export const initialTripData: Trip = {
       day: 9,
       date: "12/29 (一)",
       location: "羅馬",
-      weather: { temp: "11°C", condition: "晴", icon: "☀️" },
+      weather: { 
+        temp: "11°C", 
+        condition: "晴", 
+        icon: "☀️",
+        rainProb: "10%",
+        uvIndex: "中 (3)",
+        outfitAdvice: "適合拍照的一天！建議穿著鮮豔顏色的大衣，與羅馬古蹟形成對比。",
+        sunProtection: "建議佩戴太陽眼鏡與塗抹防曬。"
+      },
       items: [
         {
           id: "d9-1",
@@ -255,7 +328,15 @@ export const initialTripData: Trip = {
       day: 10,
       date: "12/30 (二)",
       location: "羅馬 -> 威尼斯",
-      weather: { temp: "8°C", condition: "霧", icon: "🌫️" },
+      weather: { 
+        temp: "8°C", 
+        condition: "霧", 
+        icon: "🌫️",
+        rainProb: "20%",
+        uvIndex: "低 (1)",
+        outfitAdvice: "移動至北部，氣溫明顯下降。建議穿著發熱衣、圍巾與手套。",
+        sunProtection: "無須特別防曬。"
+      },
       items: [
         {
           id: "d10-1",
@@ -282,7 +363,15 @@ export const initialTripData: Trip = {
       day: 11,
       date: "12/31 (三)",
       location: "威尼斯",
-      weather: { temp: "6°C", condition: "晴", icon: "☀️" },
+      weather: { 
+        temp: "6°C", 
+        condition: "晴", 
+        icon: "☀️",
+        rainProb: "0%",
+        uvIndex: "低 (2)",
+        outfitAdvice: "威尼斯水氣重，體感溫度低。跨年夜在戶外需準備暖暖包、厚毛帽與長大衣。",
+        sunProtection: "冬陽柔和，基本防曬即可。"
+      },
       items: [
         {
           id: "d11-1",
@@ -316,7 +405,15 @@ export const initialTripData: Trip = {
       day: 12,
       date: "1/1 (四)",
       location: "威尼斯 -> 米蘭",
-      weather: { temp: "7°C", condition: "陰", icon: "☁️" },
+      weather: { 
+        temp: "7°C", 
+        condition: "陰", 
+        icon: "☁️",
+        rainProb: "10%",
+        uvIndex: "低 (1)",
+        outfitAdvice: "米蘭時尚之都，建議穿著剪裁俐落的深色大衣，搭配圍巾展現義式風格。",
+        sunProtection: "無須特別防曬。"
+      },
       items: [
         {
           id: "d12-1",
@@ -351,7 +448,15 @@ export const initialTripData: Trip = {
       day: 13,
       date: "1/2 (五)",
       location: "米蘭 <-> 盧加諾 (瑞士)",
-      weather: { temp: "4°C", condition: "雪", icon: "❄️" },
+      weather: { 
+        temp: "4°C", 
+        condition: "雪", 
+        icon: "❄️",
+        rainProb: "60%",
+        uvIndex: "低 (1)",
+        outfitAdvice: "進入阿爾卑斯山區，可能會下雪。務必穿著防水雪靴、厚羽絨衣、手套與毛帽。",
+        sunProtection: "若有積雪，雪地反射紫外線強，請務必佩戴太陽眼鏡與塗抹防曬。"
+      },
       items: [
         {
           id: "d13-1",
@@ -368,7 +473,15 @@ export const initialTripData: Trip = {
       day: 14,
       date: "1/3 (六)",
       location: "米蘭 -> 上海",
-      weather: { temp: "8°C", condition: "晴", icon: "☀️" },
+      weather: { 
+        temp: "8°C", 
+        condition: "晴", 
+        icon: "☀️",
+        rainProb: "0%",
+        uvIndex: "低 (2)",
+        outfitAdvice: "返程飛行，建議穿著寬鬆舒適的棉質衣物。",
+        sunProtection: "無須特別防曬。"
+      },
       items: [
         {
           id: "d14-1",
@@ -384,7 +497,15 @@ export const initialTripData: Trip = {
       day: 15,
       date: "1/4 (日)",
       location: "上海 -> 台灣",
-      weather: { temp: "20°C", condition: "晴", icon: "🏠" },
+      weather: { 
+        temp: "20°C", 
+        condition: "晴", 
+        icon: "🏠",
+        rainProb: "0%",
+        uvIndex: "中 (5)",
+        outfitAdvice: "回到溫暖的家，短袖搭配薄外套即可。",
+        sunProtection: "日常防曬。"
+      },
       items: [
         {
           id: "d15-1",

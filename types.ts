@@ -1,3 +1,4 @@
+
 export enum ItineraryType {
   ATTRACTION = 'ATTRACTION',
   RESTAURANT = 'RESTAURANT',
@@ -27,6 +28,10 @@ export interface DayPlan {
     temp: string;
     condition: string;
     icon: string; // emoji
+    rainProb?: string; // e.g. "30%"
+    uvIndex?: string;  // e.g. "低 (2)"
+    outfitAdvice?: string; // e.g. "建議洋蔥式穿搭..."
+    sunProtection?: string; // e.g. "無需特別防曬"
   };
   items: ItineraryItem[];
 }
@@ -55,6 +60,9 @@ export interface Flight {
   origin: string;
   destination: string;
   date: string;
+  terminal?: string; // e.g. T1, T2
+  gate?: string;     // e.g. A12
+  baggage?: string;  // e.g. "隨身 7kg, 托運 23kg"
   notes?: string;
 }
 
@@ -62,6 +70,8 @@ export interface Accommodation {
   name: string;
   address: string;
   checkIn: string;
+  checkOut: string;
+  location: string; // For search queries
 }
 
 export interface TravelEssentials {
