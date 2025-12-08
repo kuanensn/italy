@@ -1,160 +1,139 @@
 
 import React, { useState } from 'react';
-import { Plane, Building, Phone, Wallet, Ticket, Luggage, Search, ExternalLink } from 'lucide-react';
+import { Plane, Building, Phone, Wallet, Ticket, Luggage, Search, ArrowRight, BedDouble, AlertTriangle } from 'lucide-react';
 import BudgetTracker from './BudgetTracker';
 
 const UtilityHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'FLIGHT' | 'HOTEL' | 'SOS' | 'WALLET'>('WALLET');
-  // State to track which flight has baggage rules expanded
   const [expandedBaggage, setExpandedBaggage] = useState<string | null>(null);
 
   const tabs = [
-    { id: 'WALLET', icon: <Wallet size={18} />, label: '記帳' },
-    { id: 'FLIGHT', icon: <Plane size={18} />, label: '航班' },
-    { id: 'HOTEL', icon: <Building size={18} />, label: '住宿' },
-    { id: 'SOS', icon: <Phone size={18} />, label: '緊急' },
+    { id: 'WALLET', icon: Wallet, label: '記帳' },
+    { id: 'FLIGHT', icon: Plane, label: '交通' },
+    { id: 'HOTEL', icon: Building, label: '住宿' },
+    { id: 'SOS', icon: Phone, label: '緊急' },
   ] as const;
 
   const flights = [
-    { date: '12/21', route: 'TPE ➔ PVG', airline: 'China Airlines', code: 'CI 075', time: '18:40', terminal: 'T2', gate: 'D5', note: '16:30 集合', baggage: '隨身 7kg, 托運 23kg' },
-    { date: '12/22', route: 'PVG ➔ MXP', airline: 'ITA Airways', code: 'AZ 795', time: '01:20', terminal: 'T1', gate: '-', note: '票價 6277 TWD', baggage: '隨身 8kg, 托運 23kg' },
-    { date: '12/22', route: 'MXP ➔ PMO', airline: 'ITA Airways', code: '-', time: '10:30', terminal: '-', gate: '-', note: '羅馬轉機', baggage: '隨身 45x36x20 15kg, 托運 158cm 23kg' },
-    { date: '12/25', route: 'PMO ➔ NAP', airline: 'EasyJet', code: '-', time: '07:45', terminal: '-', gate: '-', note: '票價 2921 TWD', baggage: '隨身 45x36x20 15kg, 托運 275cm 23kg' },
-    { date: '12/28', route: 'BRI ➔ FCO', airline: 'Ryanair', code: '-', time: '13:55', terminal: '-', gate: '-', note: '票價 2834 TWD', baggage: '隨身 40x25x20 10kg, 托運 80x120x120 20kg' },
-    { date: '1/3', route: 'MXP ➔ PVG', airline: 'Air China', code: '-', time: '12:10', terminal: 'T1', gate: '-', note: '返程', baggage: '隨身 5kg, 托運 23kg' },
+    { date: '12/21', from: 'TPE', to: 'PVG', airline: 'China Airlines', code: 'CI 075', time: '18:40', terminal: 'T2', gate: 'D5', baggage: '隨身 7kg, 托運 23kg' },
+    { date: '12/22', from: 'PVG', to: 'MXP', airline: 'ITA Airways', code: 'AZ 795', time: '01:20', terminal: 'T1', gate: '-', baggage: '隨身 8kg, 托運 23kg' },
+    { date: '12/22', from: 'MXP', to: 'PMO', airline: 'ITA Airways', code: '-', time: '10:30', terminal: '-', gate: '-', baggage: '隨身 15kg, 托運 23kg' },
+    { date: '12/25', from: 'PMO', to: 'NAP', airline: 'EasyJet', code: '-', time: '07:45', terminal: '-', gate: '-', baggage: '隨身 15kg, 托運 23kg' },
+    { date: '12/28', from: 'BRI', to: 'FCO', airline: 'Ryanair', code: '-', time: '13:55', terminal: '-', gate: '-', baggage: '隨身 10kg, 托運 20kg' },
+    { date: '1/3', from: 'MXP', to: 'PVG', airline: 'Air China', code: '-', time: '12:10', terminal: 'T1', gate: '-', baggage: '隨身 5kg, 托運 23kg' },
   ];
 
   const hotels = [
-      { name: 'Palermo Stay', location: 'Palermo', dates: '12/22 - 12/24', desc: '西西里島首府據點' },
-      { name: 'Napoli Stay', location: 'Naples, Italy', dates: '12/25 - 12/27', desc: '披薩與古城' },
-      { name: 'Rome Stay', location: 'Rome, Italy', dates: '12/28 - 12/30', desc: '永恆之城' },
-      { name: 'Venice Stay', location: 'Venice, Italy', dates: '12/30 - 1/1', desc: '水都浪漫' },
-      { name: 'Milan Stay', location: 'Milan, Italy', dates: '1/1 - 1/3', desc: '時尚中心' },
+      { name: 'Palermo Stay', location: 'Palermo, Sicily', dates: '12/22 - 12/24', type: '古城公寓' },
+      { name: 'Napoli Stay', location: 'Naples, Italy', dates: '12/25 - 12/27', type: '海景飯店' },
+      { name: 'Rome Stay', location: 'Rome, Italy', dates: '12/28 - 12/30', type: '歷史城區' },
+      { name: 'Venice Stay', location: 'Venice, Italy', dates: '12/30 - 1/1', type: '運河旁' },
+      { name: 'Milan Stay', location: 'Milan, Italy', dates: '1/1 - 1/3', type: '時尚區' },
   ];
 
-  const openSearch = (platform: 'agoda' | 'airbnb', query: string) => {
-      let url = '';
-      if (platform === 'agoda') {
-          url = `https://www.agoda.com/search?text=${encodeURIComponent(query)}`;
-      } else {
-          url = `https://www.airbnb.com/s/${encodeURIComponent(query)}/homes`;
-      }
-      window.open(url, '_blank');
-  };
-
   return (
-    <div className="h-full flex flex-col bg-stone-50">
-        {/* Sticky Utility Header */}
-      <div className="bg-white sticky top-0 z-10 shadow-sm p-2">
-        <div className="flex justify-between bg-stone-100 p-1 rounded-xl">
+    <div className="h-full flex flex-col">
+        {/* Sliding Tabs */}
+      <div className="bg-[#f8f5f1] pt-2 pb-4 sticky top-0 z-10">
+        <div className="flex bg-white p-1.5 rounded-full shadow-sm border border-stone-200 mx-4">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-bold transition-all duration-300 ${
                 activeTab === tab.id 
-                  ? 'bg-white text-olive-700 shadow-sm' 
-                  : 'text-stone-500 hover:text-stone-700'
+                  ? 'bg-stone-800 text-white shadow-md' 
+                  : 'text-stone-400 hover:text-stone-600'
               }`}
             >
-              {tab.icon}
-              <span className="mt-1">{tab.label}</span>
+              <tab.icon size={14} />
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 space-y-6 px-4 pb-32">
         {activeTab === 'WALLET' && <BudgetTracker />}
         
         {activeTab === 'FLIGHT' && (
-            <div className="p-4 space-y-4">
+            <div className="space-y-4">
                 {flights.map((flight, idx) => (
-                     <div 
+                    <div 
                         key={idx} 
-                        className="bg-white p-4 rounded-xl shadow-sm border border-stone-200 relative overflow-hidden cursor-pointer transition-all hover:shadow-md"
                         onClick={() => setExpandedBaggage(expandedBaggage === idx.toString() ? null : idx.toString())}
-                     >
-                        <div className="absolute top-0 right-0 p-2 bg-stone-100 rounded-bl-xl">
-                            <span className="text-xs font-mono font-bold text-stone-500">{flight.date}</span>
-                        </div>
-                        <h3 className="text-stone-800 font-bold text-lg mb-2 flex items-center gap-2">
-                            <Ticket size={16} className="text-terracotta-600"/> {flight.route}
-                        </h3>
-                        <div className="grid grid-cols-3 gap-y-3 gap-x-2 text-sm text-stone-600">
-                            <div className="col-span-1">
-                                <p className="text-[10px] text-stone-400 uppercase">航空公司</p>
-                                <p className="font-semibold">{flight.airline}</p>
+                        className="relative bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                    >
+                        {/* Cutouts for Boarding Pass Look */}
+                        <div className="absolute top-1/2 -left-3 w-6 h-6 bg-[#f8f5f1] rounded-full border-r border-stone-200"></div>
+                        <div className="absolute top-1/2 -right-3 w-6 h-6 bg-[#f8f5f1] rounded-full border-l border-stone-200"></div>
+                        <div className="absolute top-1/2 left-4 right-4 border-t-2 border-dashed border-stone-100"></div>
+
+                        {/* Top Part */}
+                        <div className="p-5 pb-8 relative">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-2 py-0.5 rounded uppercase">{flight.airline}</span>
+                                <span className="text-xs font-mono text-stone-400">{flight.date}</span>
                             </div>
-                             <div className="col-span-1">
-                                <p className="text-[10px] text-stone-400 uppercase">航廈 Terminal</p>
-                                <p className="font-semibold text-lg">{flight.terminal}</p>
-                            </div>
-                            <div className="col-span-1">
-                                <p className="text-[10px] text-stone-400 uppercase">登機口 Gate</p>
-                                <p className="font-semibold text-lg text-terracotta-600">{flight.gate}</p>
-                            </div>
-                            
-                            <div className="col-span-1">
-                                <p className="text-[10px] text-stone-400 uppercase">航班代號</p>
-                                <p className="font-semibold">{flight.code}</p>
-                            </div>
-                             <div className="col-span-2">
-                                <p className="text-[10px] text-stone-400 uppercase">起飛時間</p>
-                                <p className="font-semibold text-lg text-stone-800">{flight.time}</p>
+                            <div className="flex justify-between items-center px-2">
+                                <div className="text-center">
+                                    <div className="text-3xl font-black text-stone-800">{flight.from}</div>
+                                    <div className="text-[10px] text-stone-400 font-bold uppercase">Origin</div>
+                                </div>
+                                <Plane size={20} className="text-stone-300 rotate-90" />
+                                <div className="text-center">
+                                    <div className="text-3xl font-black text-stone-800">{flight.to}</div>
+                                    <div className="text-[10px] text-stone-400 font-bold uppercase">Dest</div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Baggage Section (Expandable) */}
-                        {expandedBaggage === idx.toString() && (
-                            <div className="mt-3 pt-3 border-t border-stone-100 animate-fadeIn">
-                                <div className="flex items-start gap-2 bg-stone-50 p-2 rounded-lg">
-                                    <Luggage size={16} className="text-stone-500 mt-0.5" />
+                        {/* Bottom Part */}
+                        <div className="bg-stone-50 p-5 pt-8 flex justify-between items-end border-t border-dashed border-stone-200">
+                             <div className="space-y-1">
+                                <div className="flex gap-4">
                                     <div>
-                                        <p className="text-xs font-bold text-stone-600 mb-1">行李規定</p>
-                                        <p className="text-xs text-stone-500">{flight.baggage}</p>
+                                        <p className="text-[9px] font-bold text-stone-400 uppercase">Flight</p>
+                                        <p className="font-mono font-bold text-stone-700">{flight.code}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] font-bold text-stone-400 uppercase">Time</p>
+                                        <p className="font-mono font-bold text-stone-700">{flight.time}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] font-bold text-stone-400 uppercase">Gate</p>
+                                        <p className="font-mono font-bold text-terracotta-600">{flight.gate}</p>
                                     </div>
                                 </div>
-                                <p className="text-[10px] text-right text-stone-400 mt-1 italic">點擊卡片以收合</p>
-                            </div>
-                        )}
-                        {expandedBaggage !== idx.toString() && (
-                             <p className="text-[10px] text-center text-stone-300 mt-2">點擊查看行李規定</p>
-                        )}
+                             </div>
+                             {expandedBaggage === idx.toString() ? (
+                                 <div className="text-xs text-stone-500 bg-white px-2 py-1 rounded border border-stone-100 animate-fadeIn">
+                                     <Luggage size={12} className="inline mr-1"/> {flight.baggage}
+                                 </div>
+                             ) : (
+                                 <Luggage size={16} className="text-stone-300" />
+                             )}
+                        </div>
                     </div>
                 ))}
             </div>
         )}
 
         {activeTab === 'HOTEL' && (
-             <div className="p-4 space-y-4">
+             <div className="space-y-5">
                  {hotels.map((hotel, idx) => (
-                     <div key={idx} className="bg-white rounded-xl shadow-sm overflow-hidden border border-stone-200">
-                        <div className="h-20 bg-stone-800 relative flex items-center justify-center">
-                            <span className="text-white font-serif italic text-xl">{hotel.name}</span>
+                     <div key={idx} className="bg-white rounded-3xl shadow-sm border border-stone-200 p-1">
+                         {/* Fake Image Gradient */}
+                        <div className={`h-24 rounded-2xl bg-gradient-to-br ${idx % 2 === 0 ? 'from-orange-100 to-rose-100' : 'from-blue-100 to-indigo-100'} flex items-center justify-center relative overflow-hidden`}>
+                             <BedDouble size={32} className="text-white/50 absolute -bottom-4 -right-4 rotate-12" />
+                             <span className="font-serif italic font-bold text-xl text-stone-800/60 z-10">{hotel.location.split(',')[0]}</span>
                         </div>
                         <div className="p-4">
-                            <div className="flex justify-between items-center mb-2">
-                                <h3 className="font-bold text-stone-800">{hotel.location.split(',')[0]}</h3>
-                                <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">{hotel.dates}</span>
+                            <div className="flex justify-between items-start mb-1">
+                                <h3 className="font-bold text-lg text-stone-800">{hotel.name}</h3>
+                                <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">{hotel.type}</span>
                             </div>
-                            <p className="text-xs text-stone-500 mb-4">{hotel.desc}</p>
-                            
-                            {/* Search Buttons */}
-                            <div className="flex gap-2">
-                                <button 
-                                    onClick={() => openSearch('agoda', hotel.location)}
-                                    className="flex-1 flex items-center justify-center gap-1 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors"
-                                >
-                                    <Search size={12} /> Agoda
-                                </button>
-                                <button 
-                                    onClick={() => openSearch('airbnb', hotel.location)}
-                                    className="flex-1 flex items-center justify-center gap-1 bg-rose-50 text-rose-600 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition-colors"
-                                >
-                                    <Search size={12} /> Airbnb
-                                </button>
-                            </div>
+                            <p className="text-xs font-mono text-stone-400 mb-0">{hotel.dates}</p>
                         </div>
                     </div>
                  ))}
@@ -162,29 +141,25 @@ const UtilityHub: React.FC = () => {
         )}
 
         {activeTab === 'SOS' && (
-             <div className="p-4 space-y-3">
-                <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-                    <h3 className="text-red-800 font-bold mb-3 flex items-center gap-2">
-                        <Phone size={18} /> 緊急聯絡電話
-                    </h3>
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
-                            <span className="font-medium text-gray-700">當地警察 (Carabinieri)</span>
-                            <a href="tel:112" className="text-red-600 font-bold px-3 py-1 bg-red-50 rounded-full">112</a>
-                        </div>
-                        <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
-                            <span className="font-medium text-gray-700">救護車</span>
-                            <a href="tel:118" className="text-red-600 font-bold px-3 py-1 bg-red-50 rounded-full">118</a>
-                        </div>
-                         <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
-                            <div className="flex flex-col">
-                                <span className="font-medium text-gray-700">駐義代表處 (急難救助)</span>
-                                <span className="text-[10px] text-gray-400">Rome Office</span>
-                            </div>
-                            <a href="tel:+393381418946" className="text-blue-600 font-bold px-3 py-1 bg-blue-50 rounded-full">撥打</a>
-                        </div>
+             <div className="space-y-4">
+                 <div className="bg-red-50 p-6 rounded-3xl border border-red-100 text-center">
+                    <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle size={32} />
                     </div>
-                </div>
+                    <h3 className="font-serif font-bold text-2xl text-red-800 mb-1">Emergency</h3>
+                    <p className="text-xs text-red-400 mb-6">義大利緊急救援電話</p>
+                    
+                    <div className="space-y-3">
+                        <a href="tel:112" className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-shadow">
+                            <span className="font-bold text-stone-700">歐盟通用 (警察/救護)</span>
+                            <span className="font-mono font-black text-xl text-red-600">112</span>
+                        </a>
+                        <a href="tel:+393381418946" className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-shadow">
+                            <span className="font-bold text-stone-700 text-left">駐義代表處<br/><span className="text-[10px] text-stone-400 font-normal">急難救助</span></span>
+                            <Phone size={20} className="text-red-600" />
+                        </a>
+                    </div>
+                 </div>
             </div>
         )}
       </div>

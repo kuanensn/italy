@@ -28,6 +28,10 @@ export const initialTripData: Trip = {
           name: "桃園機場集合",
           location: "TPE 第二航廈",
           description: "集合報到，準備出發。",
+          transportCode: "CI 075",
+          terminal: "T2",
+          status: "準點",
+          indoorMap: "https://www.taoyuan-airport.com/map",
           tips: ["起飛前 60 分鐘完成報到", "18:40 起飛"]
         },
         {
@@ -37,6 +41,9 @@ export const initialTripData: Trip = {
           name: "抵達上海浦東",
           location: "PVG",
           description: "落地浦東，準備轉機前往米蘭。",
+          terminal: "T1",
+          status: "準點",
+          indoorMap: "https://www.shanghaiairport.com/cn/jcjt/index_53161.html"
         }
       ]
     },
@@ -61,6 +68,10 @@ export const initialTripData: Trip = {
           name: "抵達米蘭",
           location: "MXP",
           description: "01:20 起飛，清晨抵達米蘭。完成入境後前往 ITA Airways 櫃檯。",
+          transportCode: "AZ 795",
+          terminal: "T1",
+          status: "抵達",
+          indoorMap: "https://www.milanomalpensa-airport.com/en/airport-services/maps",
           tips: ["行李限制: 隨身 45x36x20 15kg", "托運: 158cm 23kg"]
         },
         {
@@ -70,6 +81,10 @@ export const initialTripData: Trip = {
           name: "飛往西西里島",
           location: "Palermo Airport",
           description: "經羅馬轉機，13:40 抵達 Palermo。",
+          terminal: "A",
+          gate: "A12",
+          status: "準點",
+          indoorMap: "https://www.aeroportodipalermo.it/en/airport-map/",
           externalLinks: [{ label: "機場到市區攻略", url: "https://xhslink.com/m/2dPKG2YVXZ5" }]
         },
         {
@@ -142,6 +157,10 @@ export const initialTripData: Trip = {
           name: "前往切法盧",
           location: "Train Station",
           description: "搭乘火車前往海濱小鎮切法盧 (來回約 2h)。",
+          transportCode: "REG 5688",
+          platform: "Binario 4",
+          status: "準點",
+          indoorMap: "https://www.google.com/maps/search/?api=1&query=Palermo+Centrale+Station+Map"
         },
         {
           id: "d4-2",
@@ -181,8 +200,13 @@ export const initialTripData: Trip = {
           type: ItineraryType.TRANSPORT,
           time: "07:45",
           name: "飛往那不勒斯",
-          location: "NAP Airport",
+          location: "PMO Airport",
           description: "EasyJet 航班。08:40 抵達那不勒斯。",
+          transportCode: "U2 2831",
+          terminal: "A",
+          gate: "A04",
+          status: "準點",
+          indoorMap: "https://www.aeroportodipalermo.it/en/airport-map/",
           tips: ["行李限制: 隨身 45x36x20 15kg", "托運: 總長275cm 23kg"],
           externalLinks: [{ label: "機場到市區攻略", url: "https://xhslink.com/m/6nYyU05ycRb" }]
         },
@@ -246,8 +270,12 @@ export const initialTripData: Trip = {
           type: ItineraryType.TRANSPORT,
           time: "07:20",
           name: "巴士前往巴里",
-          location: "Bus Station",
+          location: "Napoli Centrale (Bus)",
           description: "搭乘巴士前往 Bari (約 3h10m)。",
+          transportCode: "FLIXBUS 525",
+          platform: "Stallo 12",
+          status: "準點",
+          indoorMap: "https://www.google.com/maps/search/?api=1&query=Napoli+Centrale+Station+Map",
           tips: ["票價約 525 TWD"]
         },
         {
@@ -283,8 +311,13 @@ export const initialTripData: Trip = {
           type: ItineraryType.TRANSPORT,
           time: "13:55",
           name: "飛往羅馬",
-          location: "FCO Airport",
+          location: "BRI Airport",
           description: "Ryanair 航班。15:05 抵達羅馬。",
+          transportCode: "FR 7892",
+          terminal: "1",
+          gate: "B06",
+          status: "準點",
+          indoorMap: "https://www.aeroportidipuglia.it/en/bari/mappa-aeroporto/",
           tips: ["隨身: 40x25x20 10kg", "托運: 80x120x120 20kg"]
         },
         {
@@ -355,6 +388,10 @@ export const initialTripData: Trip = {
           name: "高鐵前往威尼斯",
           location: "Roma Termini",
           description: "搭乘高鐵前往水都威尼斯 (17:34 抵達)。",
+          transportCode: "Frecciarossa 9422",
+          platform: "Binario 8",
+          status: "準點",
+          indoorMap: "https://www.romatermini.com/en/map/",
           tips: ["票價 2701 TWD/人"]
         }
       ]
@@ -432,6 +469,10 @@ export const initialTripData: Trip = {
           name: "高鐵前往米蘭",
           location: "Venice Santa Lucia",
           description: "18:15 抵達米蘭。",
+          transportCode: "Frecciarossa 9748",
+          platform: "Binario 12",
+          status: "準點",
+          indoorMap: "https://www.veneziasantalucia.it/en/map/",
           tips: ["票價 2068 TWD/人"]
         },
         {
@@ -490,6 +531,10 @@ export const initialTripData: Trip = {
           name: "抵達機場",
           location: "MXP",
           description: "12:10 起飛返回上海。",
+          transportCode: "CA 836",
+          terminal: "T1",
+          status: "準點",
+          indoorMap: "https://www.milanomalpensa-airport.com/en/airport-services/maps"
         }
       ]
     },
@@ -514,6 +559,9 @@ export const initialTripData: Trip = {
           name: "抵達浦東",
           location: "PVG",
           description: "等待轉機回台。",
+          terminal: "T2",
+          status: "準點",
+          indoorMap: "https://www.shanghaiairport.com/cn/jcjt/index_53161.html"
         },
         {
             id: "d15-2",
@@ -522,6 +570,10 @@ export const initialTripData: Trip = {
             name: "飛往台灣",
             location: "PVG -> TPE",
             description: "14:00 抵達溫暖的家。",
+            transportCode: "CI 502",
+            terminal: "T2",
+            gate: "D80",
+            status: "準點",
         }
       ]
     }

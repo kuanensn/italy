@@ -18,11 +18,18 @@ export interface ItineraryItem {
   tips?: string[];
   reservationCode?: string;
   externalLinks?: { label: string; url: string }[];
+  // Transport specific fields
+  transportCode?: string; // e.g. CI075, Frecciarossa 9406
+  terminal?: string;
+  gate?: string;
+  platform?: string;
+  status?: string; // e.g. "On Time", "Delayed", "Departed"
+  indoorMap?: string; // URL to map
 }
 
 export interface DayPlan {
   day: number;
-  date?: string; // e.g., "12/21"
+  date?: string; // e.g. "12/21"
   location: string;
   weather: {
     temp: string;
