@@ -1,27 +1,79 @@
 
-import React, { useState } from 'react';
-import { ArrowRightLeft, Volume2, Sparkles, MapPin, MessageCircle, Utensils, ShoppingBag, BedDouble, Wifi, CreditCard, Ticket } from 'lucide-react';
-import { translateText } from '../services/geminiService';
+import React, { useState, useRef } from 'react';
+import { ArrowRightLeft, Volume2, Sparkles, MapPin, MessageCircle, Utensils, ShoppingBag, BedDouble, Wifi, CreditCard, Ticket, Camera, X, Image as ImageIcon } from 'lucide-react';
+import { translateText, translateImage } from '../services/geminiService';
 
 const TranslatorHub: React.FC = () => {
   const [mode, setMode] = useState<'TRANSLATE' | 'LEARN'>('TRANSLATE');
   const [inputText, setInputText] = useState('');
-  const [translation, setTranslation] = useState<{ translated: string; pronunciation?: string } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // Base64 for preview
+  const [imageBase64Data, setImageBase64Data] = useState<string | null>(null); // Raw base64 for API
+  const [translation, setTranslation] = useState<{ translated: string; pronunciation?: string; originalText?: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [direction, setDirection] = useState<'ZH_TO_IT' | 'IT_TO_ZH'>('ZH_TO_IT');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // --- TTS Function ---
+  const speak = (text: string, lang: 'it-IT' | 'zh-TW') => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Stop previous
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9; // Slightly slower for clarity
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("您的瀏覽器不支援發音功能");
+    }
+  };
 
   const handleTranslate = async () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() && !imageBase64Data) return;
+    
     setLoading(true);
+    setTranslation(null);
+    
     try {
-      const result = await translateText(inputText, direction);
-      setTranslation(result);
+      if (imageBase64Data) {
+        // Image Translation
+        const result = await translateImage(imageBase64Data, direction);
+        setTranslation(result);
+      } else {
+        // Text Translation
+        const result = await translateText(inputText, direction);
+        setTranslation(result);
+      }
     } catch (e) {
       console.error(e);
-      setTranslation({ translated: "連線錯誤" });
+      setTranslation({ translated: "連線錯誤，請稍後再試。" });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              const result = reader.result as string;
+              setSelectedImage(result);
+              // Extract pure base64 for API (remove "data:image/jpeg;base64,")
+              const base64Raw = result.split(',')[1];
+              setImageBase64Data(base64Raw);
+              // Auto translate when image is picked
+              // We'll let user click button to confirm, or could auto-trigger. 
+              // Let's reset text to avoid confusion
+              setInputText('');
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const clearImage = () => {
+      setSelectedImage(null);
+      setImageBase64Data(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const categories = [
@@ -134,25 +186,61 @@ const TranslatorHub: React.FC = () => {
             {/* Input Area */}
             <div className="relative">
                  <div className="absolute -inset-1 bg-gradient-to-r from-olive-200 to-terracotta-200 rounded-[24px] blur opacity-30"></div>
-                 <div className="relative bg-[#fdfbf7] p-4 rounded-[20px] shadow-sm border border-stone-100">
-                    <div className="flex justify-between items-center mb-3">
+                 <div className="relative bg-[#fdfbf7] p-4 rounded-[20px] shadow-sm border border-stone-100 flex flex-col gap-2">
+                    <div className="flex justify-between items-center mb-1">
                          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{direction === 'ZH_TO_IT' ? 'Chinese' : 'Italian'}</span>
                          <button onClick={() => setDirection(d => d === 'ZH_TO_IT' ? 'IT_TO_ZH' : 'ZH_TO_IT')} className="p-2 rounded-full hover:bg-stone-100 text-stone-500 transition-colors"><ArrowRightLeft size={16}/></button>
                          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{direction === 'ZH_TO_IT' ? 'Italian' : 'Chinese'}</span>
                     </div>
-                    <textarea
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        placeholder="Type here..."
-                        className="w-full h-32 bg-transparent text-xl font-serif text-stone-800 placeholder:text-stone-300 outline-none resize-none leading-relaxed"
-                    />
-                    <div className="flex justify-end mt-2">
+
+                    {/* Image Preview */}
+                    {selectedImage ? (
+                        <div className="relative w-full h-48 bg-stone-900 rounded-xl overflow-hidden mb-2 group">
+                             <img src={selectedImage} alt="Upload preview" className="w-full h-full object-contain opacity-90" />
+                             <button onClick={clearImage} className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70">
+                                 <X size={16} />
+                             </button>
+                        </div>
+                    ) : (
+                        <textarea
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                            placeholder={direction === 'ZH_TO_IT' ? "輸入文字或上傳圖片翻譯..." : "Scrivi qui..."}
+                            className="w-full h-24 bg-transparent text-xl font-serif text-stone-800 placeholder:text-stone-300 outline-none resize-none leading-relaxed"
+                        />
+                    )}
+
+                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-stone-100/50">
+                        {/* Camera Button */}
+                        <div className="flex gap-2">
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                capture="environment"
+                                ref={fileInputRef}
+                                className="hidden" 
+                                onChange={handleImageUpload}
+                            />
+                            <button 
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-2.5 rounded-full bg-stone-100 text-stone-600 hover:bg-stone-200 active:scale-95 transition-all"
+                                title="拍照/上傳"
+                            >
+                                <Camera size={20} />
+                            </button>
+                        </div>
+
                         <button 
                             onClick={handleTranslate} 
-                            disabled={loading || !inputText}
-                            className="bg-stone-800 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg shadow-stone-200 active:scale-95 transition-transform"
+                            disabled={loading || (!inputText && !selectedImage)}
+                            className="bg-stone-800 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-stone-200 active:scale-95 transition-transform flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Translating...' : 'Translate'}
+                            {loading ? <span className="animate-pulse">Translating...</span> : (
+                                <>
+                                  {selectedImage ? '辨識並翻譯' : 'Translate'}
+                                  {!selectedImage && <ArrowRightLeft size={14} className="opacity-50" />}
+                                </>
+                            )}
                         </button>
                     </div>
                  </div>
@@ -162,10 +250,29 @@ const TranslatorHub: React.FC = () => {
             {translation && (
               <div className="bg-white p-6 rounded-[20px] shadow-sm border border-stone-100 animate-fadeIn relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-2 h-full bg-olive-500"></div>
-                 <p className="font-serif italic text-3xl text-stone-800 mb-2">{translation.translated}</p>
+                 
+                 {translation.originalText && (
+                     <div className="mb-4 pb-4 border-b border-stone-100 border-dashed">
+                         <span className="text-[10px] font-bold text-stone-400 uppercase">辨識原文</span>
+                         <p className="text-sm text-stone-600 mt-1 line-clamp-3">{translation.originalText}</p>
+                     </div>
+                 )}
+
+                 <div className="flex items-start justify-between gap-4">
+                    <p className="font-serif italic text-3xl text-stone-800 mb-2 leading-tight">{translation.translated}</p>
+                    {/* Speak Button for Result */}
+                    <button 
+                        onClick={() => speak(translation.translated, direction === 'ZH_TO_IT' ? 'it-IT' : 'zh-TW')}
+                        className="p-2 rounded-full bg-olive-50 text-olive-600 hover:bg-olive-100 active:scale-95 transition-all shrink-0"
+                    >
+                        <Volume2 size={20} />
+                    </button>
+                 </div>
+
                  {translation.pronunciation && (
-                     <div className="inline-flex items-center gap-2 bg-olive-50 px-3 py-1 rounded-full text-olive-700 text-sm font-bold">
-                         <Volume2 size={14} /> {translation.pronunciation}
+                     <div className="mt-2 inline-flex items-center gap-2 bg-stone-100 px-3 py-1.5 rounded-lg text-stone-600 text-sm font-bold">
+                         <span className="text-xs text-stone-400 uppercase mr-1">發音</span>
+                         {translation.pronunciation}
                      </div>
                  )}
               </div>
@@ -183,9 +290,18 @@ const TranslatorHub: React.FC = () => {
                  </div>
                  <div className="space-y-3 bg-white/60 backdrop-blur-sm rounded-xl p-3">
                     {cat.phrases.map((phrase, idx) => (
-                      <div key={idx} className="flex flex-col border-b border-stone-100/50 last:border-0 pb-2 last:pb-0">
-                          <p className="font-bold text-stone-800 text-lg leading-tight mb-1">{phrase.it}</p>
-                          <p className="text-xs text-stone-500 font-medium">{phrase.zh}</p>
+                      <div key={idx} className="flex justify-between items-start border-b border-stone-100/50 last:border-0 pb-3 last:pb-0 pt-1">
+                          <div className="flex flex-col">
+                            <p className="font-bold text-stone-800 text-lg leading-tight mb-1">{phrase.it}</p>
+                            <p className="text-xs text-stone-500 font-medium">{phrase.zh}</p>
+                          </div>
+                          <button 
+                             onClick={() => speak(phrase.it, 'it-IT')}
+                             className="p-2 -mr-2 text-stone-400 hover:text-olive-600 active:scale-90 transition-transform"
+                             title="播放發音"
+                          >
+                             <Volume2 size={18} />
+                          </button>
                       </div>
                     ))}
                  </div>

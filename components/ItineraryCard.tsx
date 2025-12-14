@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { ItineraryItem, ItineraryType, DayPlan } from '../types';
-import { MapPin, Utensils, Bus, Camera, Star, ShoppingBag, Navigation, Link as LinkIcon, Ticket, Clock, ChevronDown, Droplets, Snowflake, Map, MonitorCheck } from 'lucide-react';
+import { MapPin, ChevronDown, Navigation, Link as LinkIcon, Ticket, Utensils, Star, Bus, Plane, Train, MonitorCheck, Map as MapIcon } from 'lucide-react';
 
 interface Props {
   item: ItineraryItem;
@@ -11,34 +11,13 @@ interface Props {
 const ItineraryCard: React.FC<Props> = ({ item, weather }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const getTypeStyle = () => {
-    switch (item.type) {
-      case ItineraryType.RESTAURANT: 
-        return { 
-            bg: 'bg-gradient-to-br from-[#fff5f2] to-white', 
-            iconBg: 'bg-terracotta-100 text-terracotta-600',
-            icon: Utensils,
-            border: 'border-terracotta-100'
-        };
-      case ItineraryType.TRANSPORT: 
-        return { 
-            bg: 'bg-gradient-to-br from-[#f4f7ed] to-white', 
-            iconBg: 'bg-olive-100 text-olive-600',
-            icon: Bus,
-            border: 'border-olive-100'
-        };
-      default: 
-        return { 
-            bg: 'bg-gradient-to-br from-[#fefce8] to-white', 
-            iconBg: 'bg-yellow-100 text-yellow-600',
-            icon: Camera,
-            border: 'border-yellow-100'
-        };
-    }
+  // Helper to determine transport icon
+  const getTransportIcon = () => {
+      if (item.name.includes('飛') || item.name.includes('機')) return Plane;
+      if (item.name.includes('鐵') || item.name.includes('Train')) return Train;
+      return Bus;
   };
-
-  const style = getTypeStyle();
-  const Icon = style.icon;
+  const TransportIcon = getTransportIcon();
 
   const handleNavigate = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -53,169 +32,158 @@ const ItineraryCard: React.FC<Props> = ({ item, weather }) => {
       }
   };
 
-  // Determine if it looks like snow
-  const isSnow = weather && (weather.condition.includes('雪') || parseInt(weather.temp) <= 4);
-  const precipProb = weather?.rainProb || '0%';
+  // Google Maps Embed URL for preview
+  const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(item.location || item.name)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
+  // Status Color Logic
+  const getStatusColor = (status?: string) => {
+      if (!status) return 'bg-gray-100 text-gray-600';
+      if (status.includes('延誤') || status.includes('Delay')) return 'bg-red-50 text-red-700 border-red-200';
+      if (status.includes('取消')) return 'bg-stone-800 text-white';
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+  };
 
   return (
-    <div className="relative group">
+    <div className="relative group pl-2">
       {/* Timeline Dot */}
-      <div className={`absolute -left-[1.3rem] top-5 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 ${style.iconBg.replace('text-', 'bg-').split(' ')[0]}`}></div>
+      <div className={`absolute -left-[1.2rem] top-10 w-3 h-3 rounded-full border-2 border-[#f8f5f1] bg-terracotta-600 shadow-sm z-10 transition-colors group-hover:bg-terracotta-800`}></div>
 
+      {/* Main Card Container - 3 Column Layout */}
       <div 
-        onClick={() => setExpanded(!expanded)}
-        className={`relative rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border ${style.border} ${style.bg} p-1 cursor-pointer transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 overflow-hidden`}
+        className={`relative flex bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.08)] border border-stone-200 transition-all duration-300 hover:shadow-lg overflow-hidden ${expanded ? 'ring-1 ring-terracotta-200' : ''}`}
       >
-        <div className="flex items-start p-4 gap-4">
-          {/* Time Box with Weather - Enlarged */}
-          <div className="flex flex-col items-center justify-start min-w-[5rem] pt-1 gap-3">
+        
+        {/* LEFT COLUMN: Time & Weather */}
+        <div className="w-[4.5rem] bg-stone-50/80 flex flex-col items-center pt-5 pb-4 border-r border-stone-200 shrink-0 gap-3">
              <div className="flex flex-col items-center leading-none">
-                <span className="font-serif font-black text-3xl text-stone-700">{item.time.split(':')[0]}</span>
-                <span className="font-sans text-sm font-bold text-stone-400 mt-1">{item.time.split(':')[1]}</span>
+                <span className="font-serif font-black text-2xl text-stone-800">{item.time.split(':')[0]}</span>
+                <span className="font-sans text-[10px] font-bold text-stone-600 mt-1">{item.time.split(':')[1]}</span>
              </div>
              
-             {/* Weather Micro-Widget Enlarged */}
+             {/* Weather Indicator */}
              {weather && (
-                 <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1.5 w-full ${isSnow ? 'bg-blue-50 text-blue-500' : 'bg-stone-100 text-stone-500'}`}>
-                     {isSnow ? <Snowflake size={16} className="mb-1"/> : <Droplets size={16} className="mb-1"/>}
-                     <span className="text-[10px] font-bold">{precipProb}</span>
+                 <div className="flex flex-col items-center mt-1">
+                     <span className="text-lg grayscale-0 drop-shadow-sm">{weather.icon}</span>
+                     <span className="text-[9px] font-bold text-stone-500 mt-0.5">{weather.temp}</span>
                  </div>
              )}
-          </div>
+        </div>
 
-          <div className="flex-1 min-w-0 pt-0.5">
-             <div className="flex justify-between items-start mb-2">
-                 <h3 className="font-serif font-bold text-xl text-stone-800 leading-tight truncate pr-2">{item.name}</h3>
+        {/* CENTER COLUMN: Info & Actions */}
+        <div 
+            className="flex-1 min-w-0 p-3 pt-4 flex flex-col relative" 
+            onClick={() => setExpanded(!expanded)}
+        >
+             {/* Header */}
+             <div className="flex justify-between items-start mb-1 pr-1">
+                 <h3 className="font-serif font-bold text-base text-stone-900 leading-tight truncate">{item.name}</h3>
                  <div className={`transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}>
-                    <ChevronDown size={20} className="text-stone-300" />
+                    <ChevronDown size={16} className="text-stone-400" />
                  </div>
              </div>
-             <p className="text-sm text-stone-500 font-medium flex items-center gap-1.5 truncate">
-                <MapPin size={14} /> {item.location}
-             </p>
+             
+             {/* Location Subtitle */}
+             <div className="flex items-center gap-1 text-xs text-stone-600 font-bold mb-2 truncate">
+                <MapPin size={10} className="shrink-0 text-stone-400" />
+                <span className="truncate">{item.location}</span>
+             </div>
 
-            {/* Real-time Transport Dashboard */}
-             {item.type === ItineraryType.TRANSPORT && (item.terminal || item.gate || item.platform) && (
-                 <div className="mt-3 bg-white/60 rounded-xl p-2 border border-olive-100/50 flex flex-wrap gap-2 items-center">
+             {/* Transport Dashboard (Compact) */}
+             {item.type === ItineraryType.TRANSPORT && (
+                 <div className="mb-2 flex flex-wrap gap-1.5">
                     {item.transportCode && (
-                        <span className="text-[10px] font-bold bg-olive-50 text-olive-700 px-2 py-1 rounded">
-                            {item.transportCode}
+                        <span className="inline-flex items-center gap-1 text-[9px] font-bold bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded border border-stone-200">
+                           <TransportIcon size={10} /> {item.transportCode}
                         </span>
+                    )}
+                    {(item.terminal || item.gate || item.platform) && (
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-orange-50 border border-orange-100">
+                             {item.terminal && <span className="text-[9px] font-bold text-orange-800">T{item.terminal}</span>}
+                             {item.gate && <span className="text-[9px] font-bold text-orange-700">Gate {item.gate}</span>}
+                             {item.platform && <span className="text-[9px] font-bold text-orange-700">Plat {item.platform}</span>}
+                        </div>
                     )}
                     {item.status && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
-                             <MonitorCheck size={10} /> {item.status}
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${getStatusColor(item.status)}`}>
+                            {item.status}
                         </span>
                     )}
-                    <div className="flex items-center gap-3 ml-auto pr-1">
-                        {item.terminal && (
-                            <div className="flex flex-col items-center leading-none">
-                                <span className="text-[8px] font-bold text-stone-400 uppercase">Term</span>
-                                <span className="text-sm font-bold text-stone-700">{item.terminal}</span>
-                            </div>
-                        )}
-                        {item.gate && (
-                            <div className="flex flex-col items-center leading-none">
-                                <span className="text-[8px] font-bold text-stone-400 uppercase">Gate</span>
-                                <span className="text-sm font-bold text-terracotta-600">{item.gate}</span>
-                            </div>
-                        )}
-                         {item.platform && (
-                            <div className="flex flex-col items-center leading-none">
-                                <span className="text-[8px] font-bold text-stone-400 uppercase">Binario</span>
-                                <span className="text-sm font-bold text-terracotta-600">{item.platform}</span>
-                            </div>
-                        )}
-                    </div>
                  </div>
              )}
-          </div>
-          
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm flex-shrink-0 ${style.iconBg}`}>
-             <Icon size={18} />
-          </div>
-        </div>
 
-        {/* Action Bar */}
-        <div className="px-5 pb-4 flex gap-2 items-center">
-            {item.indoorMap && (
-                 <button 
-                    onClick={handleIndoorMap}
-                    className="flex items-center gap-1 text-[10px] font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-full border border-stone-200 transition-colors shadow-sm"
-                >
-                    <Map size={12} /> 內部地圖
-                </button>
-            )}
-            
-            {item.reservationCode && (
-                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
-                    <Ticket size={12} /> 預約: {item.reservationCode}
+             {/* Quick Actions (Collapsed view badge) */}
+             {!expanded && item.reservationCode && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded self-start border border-emerald-200 mt-auto">
+                    <Ticket size={10} /> {item.reservationCode}
                  </span>
-            )}
-             <button 
-                onClick={handleNavigate}
-                className="ml-auto flex items-center gap-1 text-[10px] font-bold text-stone-500 hover:text-blue-600 bg-white hover:bg-blue-50 px-3 py-1.5 rounded-full border border-stone-100 transition-colors shadow-sm"
-            >
-                <Navigation size={12} /> 導航
-            </button>
+             )}
+
+             {/* EXPANDED CONTENT AREA */}
+             {expanded && (
+                <div className="mt-2 pt-2 border-t border-dashed border-stone-200 space-y-3 animate-fadeIn">
+                    {item.description && <p className="text-xs text-stone-700 font-medium leading-relaxed">"{item.description}"</p>}
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                        {item.indoorMap && (
+                            <button onClick={handleIndoorMap} className="flex-1 flex items-center justify-center gap-1 text-[10px] font-bold bg-stone-800 text-white py-2 rounded-lg active:scale-95 transition-transform shadow-sm">
+                                <MapIcon size={10} /> 室內地圖
+                            </button>
+                        )}
+                        {item.externalLinks?.map((link, i) => (
+                             <a key={i} href={link.url} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-1 text-[10px] font-bold bg-white text-stone-700 border border-stone-200 py-2 rounded-lg active:scale-95 transition-transform shadow-sm hover:bg-stone-50">
+                                <LinkIcon size={10} /> {link.label}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Must Eat / Tips Tags */}
+                    {(item.mustEat || item.tips) && (
+                        <div className="space-y-2">
+                            {item.mustEat && (
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="text-[9px] font-bold text-terracotta-600 uppercase mr-1 flex items-center"><Utensils size={10} className="mr-0.5"/> 必吃</span>
+                                    {item.mustEat.map(f => <span key={f} className="text-[10px] font-bold text-stone-700 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">{f}</span>)}
+                                </div>
+                            )}
+                            {item.tips && (
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="text-[9px] font-bold text-blue-500 uppercase mr-1 flex items-center"><Star size={10} className="mr-0.5"/> Tips</span>
+                                    {item.tips.map(t => <span key={t} className="text-[10px] font-bold text-stone-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">{t}</span>)}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+             )}
         </div>
 
-        {/* Expanded Content */}
-        {expanded && (
-          <div className="px-5 pb-5 pt-1 space-y-4 animate-fadeIn">
-            {item.description && (
-                <p className="text-base text-stone-600 leading-relaxed font-light font-sans border-t border-stone-100 pt-3 italic">
-                 "{item.description}"
-                </p>
-            )}
-
-            {/* Tags Grid */}
-            <div className="grid grid-cols-1 gap-3">
-                {item.mustEat && item.mustEat.length > 0 && (
-                <div className="bg-white/60 rounded-xl p-3 border border-terracotta-100/50">
-                    <div className="flex items-center gap-1.5 text-terracotta-700 text-[10px] font-bold mb-2 uppercase tracking-wider">
-                    <Utensils size={12} /> Must Eat
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                    {item.mustEat.map((food, i) => (
-                        <span key={i} className="text-sm text-stone-700 font-medium bg-terracotta-50 px-2.5 py-1 rounded-md">
-                        {food}
-                        </span>
-                    ))}
-                    </div>
+        {/* RIGHT COLUMN: Map Preview */}
+        <div className="w-[5.5rem] p-2 pl-0 flex flex-col justify-start shrink-0">
+             <div 
+                className="w-full aspect-square rounded-2xl overflow-hidden relative shadow-inner bg-stone-100 group/map cursor-pointer hover:shadow-md transition-all active:scale-95 border border-stone-200"
+                onClick={handleNavigate}
+             >
+                {/* Embedded Map */}
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    frameBorder="0" 
+                    scrolling="no" 
+                    marginHeight={0} 
+                    marginWidth={0} 
+                    src={mapUrl}
+                    className="absolute inset-0 w-full h-full opacity-80 pointer-events-none grayscale-[0]"
+                    title="Map Preview"
+                ></iframe>
+                
+                {/* Floating Nav Icon */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-stone-800 rounded-full flex items-center justify-center shadow-md text-white z-10 ring-2 ring-white">
+                    <Navigation size={14} fill="currentColor" />
                 </div>
-                )}
+             </div>
+        </div>
 
-                {item.tips && item.tips.length > 0 && (
-                <div className="bg-white/60 rounded-xl p-3 border border-blue-100/50">
-                    <div className="flex items-center gap-1.5 text-blue-700 text-[10px] font-bold mb-2 uppercase tracking-wider">
-                    <Star size={12} /> Tips
-                    </div>
-                    <ul className="list-disc list-inside text-sm text-stone-600 space-y-1">
-                    {item.tips.map((tip, i) => <li key={i}>{tip}</li>)}
-                    </ul>
-                </div>
-                )}
-            </div>
-
-            {item.externalLinks && item.externalLinks.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                    {item.externalLinks.map((link, i) => (
-                        <a 
-                            key={i} 
-                            href={link.url} 
-                            target="_blank" 
-                            rel="noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-1.5 text-xs font-bold text-stone-500 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-full transition-colors"
-                        >
-                            <LinkIcon size={12} /> {link.label}
-                        </a>
-                    ))}
-                </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

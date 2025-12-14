@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Expense } from '../types';
-import { Plus, Trash2, Wallet, PieChart as PieChartIcon, RefreshCw, Filter } from 'lucide-react';
-
-const STORAGE_KEY = 'dolce-vita-expenses-v1';
+import { Plus, Trash2, Wallet, PieChart as PieChartIcon, RefreshCw, Filter, Cloud, Users, Loader2 } from 'lucide-react';
+import { db } from '../services/firebase';
+import { ref, onValue, push, set, remove } from 'firebase/database';
 
 const defaultExpenses: Expense[] = [
     { id: 'init-1', description: '米蘭機票 (ITA)', amount: 6277, currency: 'TWD', category: 'TRANSPORT', paidBy: 'ME' },
@@ -84,16 +84,8 @@ const SimpleDonutChart = ({ data }: { data: { label: string, value: number, colo
 };
 
 const BudgetTracker: React.FC = () => {
-  const [expenses, setExpenses] = useState<Expense[]>(() => {
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : defaultExpenses;
-    } catch (e) {
-        console.error("Failed to load expenses", e);
-        return defaultExpenses;
-    }
-  });
-
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('EUR');
@@ -103,34 +95,70 @@ const BudgetTracker: React.FC = () => {
 
   const rate = 34.5; // TWD to EUR example
 
+  // Firebase Synchronization
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  }, [expenses]);
+    const expensesRef = ref(db, 'expenses');
+    // Real-time listener
+    const unsubscribe = onValue(expensesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Convert object to array
+            const expenseList = Object.values(data) as Expense[];
+            setExpenses(expenseList);
+        } else {
+            setExpenses([]);
+        }
+        setLoading(false);
+    }, (error) => {
+        console.error("Firebase sync error:", error);
+        setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const addExpense = () => {
     if (!description || !amount) return;
-    const newExpense: Expense = {
-      id: crypto.randomUUID(),
-      description,
-      amount: parseFloat(amount),
-      currency,
-      category,
-      paidBy
-    };
-    setExpenses([...expenses, newExpense]);
+
+    // Use Firebase Push to generate a unique ID
+    const expensesRef = ref(db, 'expenses');
+    const newExpenseRef = push(expensesRef);
+    const newId = newExpenseRef.key;
+
+    if (newId) {
+        const newExpense: Expense = {
+          id: newId, // Use Firebase key as ID
+          description,
+          amount: parseFloat(amount),
+          currency,
+          category,
+          paidBy
+        };
+        // Write to Firebase
+        set(newExpenseRef, newExpense);
+    }
+    
     setDescription('');
     setAmount('');
   };
 
   const removeExpense = (id: string) => {
-    if (window.confirm('確定要刪除這筆紀錄嗎？')) {
-        setExpenses(expenses.filter(e => e.id !== id));
+    if (window.confirm('確定要刪除這筆紀錄嗎？這會同步刪除所有人的資料。')) {
+        const expenseRef = ref(db, `expenses/${id}`);
+        remove(expenseRef);
     }
   };
 
   const resetToDefault = () => {
-      if (window.confirm('確定要重置所有記帳資料回到預設值嗎？自訂的紀錄將會消失。')) {
-          setExpenses(defaultExpenses);
+      if (window.confirm('確定要初始化資料庫嗎？這將會覆蓋現有資料。')) {
+          const expensesRef = ref(db, 'expenses');
+          // Clear current
+          remove(expensesRef);
+          // Add defaults one by one
+          defaultExpenses.forEach(exp => {
+             const newRef = push(expensesRef);
+             set(newRef, { ...exp, id: newRef.key });
+          });
       }
   }
 
@@ -189,136 +217,163 @@ const BudgetTracker: React.FC = () => {
   return (
     <div className="p-4 space-y-6">
       
-      {/* Chart Section */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-4">
-            <h3 className="text-gray-700 font-bold flex items-center gap-2">
-                <PieChartIcon size={18} /> 消費分析
-            </h3>
-            <div className="flex bg-gray-100 rounded-lg p-1">
-                <button 
-                    onClick={() => setFilterType('ME')}
-                    className={`px-3 py-1 text-xs rounded-md transition-all ${filterType === 'ME' ? 'bg-white shadow text-olive-700 font-bold' : 'text-gray-500'}`}
-                >個人</button>
-                 <button 
-                    onClick={() => setFilterType('GROUP')}
-                    className={`px-3 py-1 text-xs rounded-md transition-all ${filterType === 'GROUP' ? 'bg-white shadow text-olive-700 font-bold' : 'text-gray-500'}`}
-                >團體</button>
-                <button 
-                    onClick={() => setFilterType('ALL')}
-                    className={`px-3 py-1 text-xs rounded-md transition-all ${filterType === 'ALL' ? 'bg-white shadow text-olive-700 font-bold' : 'text-gray-500'}`}
-                >全部</button>
-            </div>
-        </div>
-        <SimpleDonutChart data={chartData} />
-      </div>
-
-      <div className="bg-olive-50 p-6 rounded-2xl shadow-sm text-center border border-olive-100 relative overflow-hidden">
-        <h3 className="text-olive-800 font-serif mb-1">
-            {filterType === 'ALL' ? '總支出' : filterType === 'ME' ? '個人總支出' : '團體總支出'}
-        </h3>
-        <p className="text-3xl font-bold text-olive-900">
-          TWD {totalTWD.toLocaleString()}
-        </p>
-        <button 
-            onClick={resetToDefault}
-            className="absolute top-2 right-2 p-1.5 bg-olive-100 rounded-full text-olive-600 opacity-50 hover:opacity-100"
-            title="重置資料"
-        >
-            <RefreshCw size={12} />
-        </button>
-      </div>
-
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <h4 className="font-bold text-gray-700 mb-3 flex items-center gap-2">
-          <Plus size={16} /> 新增支出
-        </h4>
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <input 
-            type="text" 
-            placeholder="項目 (例如: 義式冰淇淋)" 
-            className="col-span-2 p-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-olive-500 outline-none"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <input 
-            type="number" 
-            placeholder="金額" 
-            className="p-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-olive-500 outline-none"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <select 
-            className="p-2 rounded-lg border border-gray-200 text-sm bg-white"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-          >
-            <option value="EUR">歐元 € (EUR)</option>
-            <option value="TWD">台幣 $ (TWD)</option>
-            <option value="USD">美元 $ (USD)</option>
-            <option value="JPY">日幣 ¥ (JPY)</option>
-          </select>
-          <select 
-            className="p-2 rounded-lg border border-gray-200 text-sm bg-white"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as any)}
-          >
-            <option value="FOOD">食物</option>
-            <option value="TRANSPORT">交通</option>
-            <option value="SHOPPING">購物</option>
-            <option value="STAY">住宿</option>
-            <option value="OTHER">其他</option>
-          </select>
-           <select 
-            className="col-span-2 p-2 rounded-lg border border-gray-200 text-sm bg-white"
-            value={paidBy}
-            onChange={(e) => setPaidBy(e.target.value as any)}
-          >
-            <option value="ME">個人支出 (我)</option>
-            <option value="GROUP">團體支出 (分攤)</option>
-          </select>
-        </div>
-        <button 
-          onClick={addExpense}
-          className="w-full bg-olive-600 text-white py-2 rounded-lg font-bold shadow-md active:scale-95 transition-transform"
-        >
-          新增紀錄
-        </button>
-      </div>
-
-      <div className="space-y-3 pb-20">
-        {filteredExpenses.slice().reverse().map(expense => (
-          <div key={expense.id} className="flex justify-between items-center bg-white p-3 rounded-lg border-b border-gray-100 shadow-sm animate-fadeIn">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full ${expense.paidBy === 'GROUP' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
-                {expense.category === 'FOOD' && <Wallet size={16} />}
-                {expense.category === 'TRANSPORT' && <Wallet size={16} />} 
-                {/* Simplified icons */}
-                <Wallet size={16} />
-              </div>
-              <div>
-                <p className="font-bold text-gray-800 text-sm">{expense.description}</p>
-                <p className="text-xs text-gray-500 capitalize">
-                    {expense.category === 'FOOD' && '食物'}
-                    {expense.category === 'TRANSPORT' && '交通'}
-                    {expense.category === 'SHOPPING' && '購物'}
-                    {expense.category === 'STAY' && '住宿'}
-                    {expense.category === 'OTHER' && '其他'}
-                     • {expense.paidBy === 'ME' ? '個人' : '團體'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="font-mono font-bold text-gray-700">
-                {expense.currency} {expense.amount.toLocaleString()}
-              </span>
-              <button onClick={() => removeExpense(expense.id)} className="text-red-400 hover:text-red-600 p-1">
-                <Trash2 size={16} />
-              </button>
-            </div>
+      {/* Cloud Sync Status Banner */}
+      <div className="flex items-center justify-between bg-stone-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm">
+          <div className="flex items-center gap-2">
+              <Cloud size={14} className="text-sky-400" />
+              <span>雲端同步中</span>
           </div>
-        ))}
+          <div className="flex items-center gap-2 text-stone-400">
+              <Users size={14} />
+              <span>多人共用</span>
+          </div>
       </div>
+
+      {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-stone-400">
+              <Loader2 className="animate-spin mb-2" />
+              <span className="text-xs">正在同步雲端資料...</span>
+          </div>
+      ) : (
+      <>
+        {/* Chart Section */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-gray-700 font-bold flex items-center gap-2">
+                    <PieChartIcon size={18} /> 消費分析
+                </h3>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                    <button 
+                        onClick={() => setFilterType('ME')}
+                        className={`px-3 py-1 text-xs rounded-md transition-all ${filterType === 'ME' ? 'bg-white shadow text-olive-700 font-bold' : 'text-gray-500'}`}
+                    >個人</button>
+                    <button 
+                        onClick={() => setFilterType('GROUP')}
+                        className={`px-3 py-1 text-xs rounded-md transition-all ${filterType === 'GROUP' ? 'bg-white shadow text-olive-700 font-bold' : 'text-gray-500'}`}
+                    >團體</button>
+                    <button 
+                        onClick={() => setFilterType('ALL')}
+                        className={`px-3 py-1 text-xs rounded-md transition-all ${filterType === 'ALL' ? 'bg-white shadow text-olive-700 font-bold' : 'text-gray-500'}`}
+                    >全部</button>
+                </div>
+            </div>
+            <SimpleDonutChart data={chartData} />
+        </div>
+
+        <div className="bg-olive-50 p-6 rounded-2xl shadow-sm text-center border border-olive-100 relative overflow-hidden">
+            <h3 className="text-olive-800 font-serif mb-1">
+                {filterType === 'ALL' ? '總支出' : filterType === 'ME' ? '個人總支出' : '團體總支出'}
+            </h3>
+            <p className="text-3xl font-bold text-olive-900">
+            TWD {totalTWD.toLocaleString()}
+            </p>
+            {expenses.length === 0 && (
+                 <button 
+                    onClick={resetToDefault}
+                    className="absolute top-2 right-2 p-1.5 bg-olive-100 rounded-full text-olive-600 opacity-50 hover:opacity-100"
+                    title="初始化預設資料"
+                >
+                    <RefreshCw size={12} />
+                </button>
+            )}
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h4 className="font-bold text-gray-700 mb-3 flex items-center gap-2">
+            <Plus size={16} /> 新增支出
+            </h4>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+            <input 
+                type="text" 
+                placeholder="項目 (例如: 義式冰淇淋)" 
+                className="col-span-2 p-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-olive-500 outline-none"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+            />
+            <input 
+                type="number" 
+                placeholder="金額" 
+                className="p-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-olive-500 outline-none"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+            />
+            <select 
+                className="p-2 rounded-lg border border-gray-200 text-sm bg-white"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+            >
+                <option value="EUR">歐元 € (EUR)</option>
+                <option value="TWD">台幣 $ (TWD)</option>
+                <option value="USD">美元 $ (USD)</option>
+                <option value="JPY">日幣 ¥ (JPY)</option>
+            </select>
+            <select 
+                className="p-2 rounded-lg border border-gray-200 text-sm bg-white"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as any)}
+            >
+                <option value="FOOD">食物</option>
+                <option value="TRANSPORT">交通</option>
+                <option value="SHOPPING">購物</option>
+                <option value="STAY">住宿</option>
+                <option value="OTHER">其他</option>
+            </select>
+            <select 
+                className="col-span-2 p-2 rounded-lg border border-gray-200 text-sm bg-white"
+                value={paidBy}
+                onChange={(e) => setPaidBy(e.target.value as any)}
+            >
+                <option value="ME">個人支出 (我)</option>
+                <option value="GROUP">團體支出 (分攤)</option>
+            </select>
+            </div>
+            <button 
+            onClick={addExpense}
+            className="w-full bg-olive-600 text-white py-2 rounded-lg font-bold shadow-md active:scale-95 transition-transform"
+            >
+            同步新增
+            </button>
+        </div>
+
+        <div className="space-y-3 pb-20">
+            {filteredExpenses.slice().reverse().map(expense => (
+            <div key={expense.id} className="flex justify-between items-center bg-white p-3 rounded-lg border-b border-gray-100 shadow-sm animate-fadeIn">
+                <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${expense.paidBy === 'GROUP' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
+                    {expense.category === 'FOOD' && <Wallet size={16} />}
+                    {expense.category === 'TRANSPORT' && <Wallet size={16} />} 
+                    <Wallet size={16} />
+                </div>
+                <div>
+                    <p className="font-bold text-gray-800 text-sm">{expense.description}</p>
+                    <p className="text-xs text-gray-500 capitalize">
+                        {expense.category === 'FOOD' && '食物'}
+                        {expense.category === 'TRANSPORT' && '交通'}
+                        {expense.category === 'SHOPPING' && '購物'}
+                        {expense.category === 'STAY' && '住宿'}
+                        {expense.category === 'OTHER' && '其他'}
+                        • {expense.paidBy === 'ME' ? '個人' : '團體'}
+                    </p>
+                </div>
+                </div>
+                <div className="flex items-center gap-3">
+                <span className="font-mono font-bold text-gray-700">
+                    {expense.currency} {expense.amount.toLocaleString()}
+                </span>
+                <button onClick={() => removeExpense(expense.id)} className="text-red-400 hover:text-red-600 p-1">
+                    <Trash2 size={16} />
+                </button>
+                </div>
+            </div>
+            ))}
+            {filteredExpenses.length === 0 && (
+                <div className="text-center text-stone-400 py-8 text-sm">
+                    尚無雲端資料
+                </div>
+            )}
+        </div>
+      </>
+      )}
     </div>
   );
 };

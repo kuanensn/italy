@@ -24,26 +24,34 @@ export const initialTripData: Trip = {
         {
           id: "d1-1",
           type: ItineraryType.TRANSPORT,
-          time: "16:30",
+          time: "15:30",
           name: "桃園機場集合",
           location: "TPE 第二航廈",
           description: "集合報到，準備出發。",
-          transportCode: "CI 075",
+          transportCode: "MU 5006",
           terminal: "T2",
           status: "準點",
           indoorMap: "https://www.taoyuan-airport.com/map",
-          tips: ["起飛前 60 分鐘完成報到", "18:40 起飛"]
+          tips: ["16:00 東方航空櫃檯報到", "18:00 抵達登機口"]
         },
         {
           id: "d1-2",
           type: ItineraryType.TRANSPORT,
-          time: "20:25",
-          name: "抵達上海浦東",
-          location: "PVG",
-          description: "落地浦東，準備轉機前往米蘭。",
-          terminal: "T1",
-          status: "準點",
-          indoorMap: "https://www.shanghaiairport.com/cn/jcjt/index_53161.html"
+          time: "18:40",
+          name: "飛往上海",
+          location: "TPE -> PVG",
+          description: "航程 1h45m，20:25 抵達浦東機場 T1。",
+          transportCode: "MU 5006",
+          terminal: "T2",
+          status: "準點"
+        },
+        {
+            id: "d1-3",
+            type: ItineraryType.ATTRACTION,
+            time: "20:30",
+            name: "浦東機場轉機休息",
+            location: "PVG T1",
+            description: "等待轉機，休息時間約 4 小時。",
         }
       ]
     },
@@ -64,82 +72,51 @@ export const initialTripData: Trip = {
         {
           id: "d2-1",
           type: ItineraryType.TRANSPORT,
-          time: "07:00",
-          name: "抵達米蘭",
-          location: "MXP",
-          description: "01:20 起飛，清晨抵達米蘭。完成入境後前往 ITA Airways 櫃檯。",
-          transportCode: "AZ 795",
+          time: "01:20",
+          name: "飛往米蘭",
+          location: "PVG -> MXP",
+          description: "航程 12h40m，07:00 抵達米蘭 Malpensa。",
+          transportCode: "MU 243",
           terminal: "T1",
-          status: "抵達",
-          indoorMap: "https://www.milanomalpensa-airport.com/en/airport-services/maps",
-          tips: ["行李限制: 隨身 45x36x20 15kg", "托運: 158cm 23kg"]
+          status: "準點"
         },
         {
           id: "d2-2",
           type: ItineraryType.TRANSPORT,
-          time: "10:30",
-          name: "飛往西西里島",
-          location: "Palermo Airport",
-          description: "經羅馬轉機，13:40 抵達 Palermo。",
-          terminal: "A",
-          gate: "A12",
+          time: "13:05",
+          name: "轉機飛往西西里",
+          location: "MXP -> PMO",
+          description: "Ryanair 航班。11:30 櫃檯報到，14:50 抵達 Palermo。",
+          transportCode: "Ryanair",
+          terminal: "T1",
           status: "準點",
-          indoorMap: "https://www.aeroportodipalermo.it/en/airport-map/",
+          tips: ["11:30 櫃檯報到", "12:30 抵達登機口"],
           externalLinks: [{ label: "機場到市區攻略", url: "https://xhslink.com/m/2dPKG2YVXZ5" }]
         },
         {
           id: "d2-3",
           type: ItineraryType.ATTRACTION,
-          time: "15:00",
-          name: "巴勒莫市區巡禮",
+          time: "18:00",
+          name: "巴勒莫城市巡禮",
           location: "Palermo",
-          description: "探索西西里首府的諾曼與阿拉伯風情。",
-          mustEat: ["Mercato Ballarò市場海鮮"],
-          tips: ["參觀海軍元帥聖母堂", "四角廣場", "諾曼王宮", "巴勒莫主教座堂"]
+          description: "海軍元帥聖母堂、四角廣場、Mercato Ballarò 市場(海鮮)、諾曼王宮、巴勒莫主教座堂。",
+          mustEat: ["Mercato Ballarò 海鮮"],
+          tips: ["四角廣場古城歷史中心"]
+        },
+        {
+          id: "d2-4",
+          type: ItineraryType.ATTRACTION,
+          time: "20:00",
+          name: "入住巴勒莫飯店",
+          location: "P.za Giulio Cesare, 19, Palermo",
+          description: "Check-in 休息。",
         }
       ]
     },
     {
       day: 3,
       date: "12/23 (二)",
-      location: "西西里島 (巴勒莫)",
-      weather: { 
-        temp: "16°C", 
-        condition: "晴時多雲", 
-        icon: "⛅",
-        rainProb: "20%",
-        uvIndex: "中 (3)",
-        outfitAdvice: "適合洋蔥式穿搭，早晚溫差大，帶一件輕薄羽絨或羊毛衫。",
-        sunProtection: "外出時建議佩戴帽子。"
-      },
-      items: [
-        {
-          id: "d3-1",
-          type: ItineraryType.ATTRACTION,
-          time: "09:00",
-          name: "佩萊格​​里諾山",
-          location: "Monte Pellegrino",
-          description: "俯瞰巴勒莫灣的絕佳視角。",
-        },
-        {
-          id: "d3-2",
-          type: ItineraryType.RESTAURANT,
-          time: "12:00",
-          name: "巴勒莫美食探險",
-          location: "Palermo",
-          description: "參考小紅書推薦的在地美食。",
-          externalLinks: [
-             { label: "美食筆記 1", url: "https://xhslink.com/m/8nncgeJwxoU" },
-             { label: "美食筆記 2", url: "https://xhslink.com/m/8VWjThardWi" },
-             { label: "美食筆記 3", url: "https://xhslink.com/m/6iMd1FbX7v1" }
-          ]
-        }
-      ]
-    },
-    {
-      day: 4,
-      date: "12/24 (三)",
-      location: "切法盧 (Cefalù)",
+      location: "西西里島 (切法盧)",
       weather: { 
         temp: "15°C", 
         condition: "晴朗", 
@@ -151,33 +128,93 @@ export const initialTripData: Trip = {
       },
       items: [
         {
-          id: "d4-1",
+          id: "d3-1",
           type: ItineraryType.TRANSPORT,
           time: "09:00",
-          name: "前往切法盧",
-          location: "Train Station",
-          description: "搭乘火車前往海濱小鎮切法盧 (來回約 2h)。",
-          transportCode: "REG 5688",
-          platform: "Binario 4",
+          name: "火車前往切法盧",
+          location: "Palermo Centrale",
+          description: "搭乘 RV5354 (往 Messina Centrale 方向) 至 Cefalù Station。",
+          transportCode: "RV 5354",
           status: "準點",
-          indoorMap: "https://www.google.com/maps/search/?api=1&query=Palermo+Centrale+Station+Map"
+          externalLinks: [{ label: "往返火車攻略", url: "http://xhslink.com/o/7RJkOW7WUcu" }]
+        },
+        {
+          id: "d3-2",
+          type: ItineraryType.ATTRACTION,
+          time: "10:30",
+          name: "切法盧全景與巨岩",
+          location: "Cefalù",
+          description: "上午先上山看全景：Punto Panoramico, Point de Vue, Castello di Cefalù (門票5歐)。",
+          tips: ["Scalinata Fiore (石板台階花壇)", "Bastione di Capo Marchiafava"]
+        },
+        {
+          id: "d3-3",
+          type: ItineraryType.ATTRACTION,
+          time: "13:00",
+          name: "古城漫步與海灘",
+          location: "Cefalù Old Town",
+          description: "切法盧主教座堂、Porta Marina、中世紀洗衣池、Molo di Cefalú (天堂電影院取景地)。",
+          tips: ["Costa di Cefalù 海灘"]
+        },
+        {
+          id: "d3-4",
+          type: ItineraryType.RESTAURANT,
+          time: "17:00",
+          name: "切法盧美食",
+          location: "Cefalù",
+          description: "品嚐在地美食。",
+          mustEat: ["開心果 Gelato", "Pasta e Pasti (CP值高)", "南義傳統三明治", "炸飯糰"],
+          externalLinks: [
+              { label: "開心果 Gelato", url: "https://maps.app.goo.gl/m2HdNfTB9msyBLey6" },
+              { label: "Pasta e Pasti", url: "https://maps.app.goo.gl/NKDpFmKJ2XnFJUcj7" },
+              { label: "南義三明治", url: "https://maps.app.goo.gl/vACNkuzZYP7QvPN68" }
+          ]
+        },
+        {
+            id: "d3-5",
+            type: ItineraryType.TRANSPORT,
+            time: "19:00",
+            name: "返回巴勒莫",
+            location: "Cefalù Station",
+            description: "搭乘火車返回巴勒莫。",
+        }
+      ]
+    },
+    {
+      day: 4,
+      date: "12/24 (三)",
+      location: "西西里島 (巴勒莫)",
+      weather: { 
+        temp: "16°C", 
+        condition: "多雲", 
+        icon: "⛅",
+        rainProb: "10%",
+        uvIndex: "中 (3)",
+        outfitAdvice: "適合洋蔥式穿搭，早晚溫差大。",
+        sunProtection: "基本防曬。"
+      },
+      items: [
+        {
+          id: "d4-1",
+          type: ItineraryType.ATTRACTION,
+          time: "08:00",
+          name: "佩萊格​​里諾山",
+          location: "Monte Pellegrino",
+          description: "搭乘公車前往 Santuario (約 1h)。",
+          tips: ["Stazione Centrale Balsamo 上車 (N2/101/102/107)", "Montepellegrino Loria 轉乘 812"]
         },
         {
           id: "d4-2",
-          type: ItineraryType.ATTRACTION,
-          time: "10:30",
-          name: "Castello di Cefalù",
-          location: "Cefalù",
-          description: "攀登切法盧巨岩，俯瞰紅瓦屋頂與蔚藍地中海。",
-          tips: ["門票 5歐 (可刷卡)", "Point de Vue 全景點", "天堂電影院取景地 Molo di Cefalú"]
-        },
-        {
-          id: "d4-3",
-          type: ItineraryType.ATTRACTION,
-          time: "14:00",
-          name: "中世紀洗衣池與海灘",
-          location: "Lavatoio Medievale",
-          description: "漫步古老街道，參觀中世紀洗衣池與 Costa di Cefalù 海灘。",
+          type: ItineraryType.RESTAURANT,
+          time: "12:00",
+          name: "巴勒莫美食探險",
+          location: "Palermo",
+          description: "參考小紅書推薦的在地美食。",
+          externalLinks: [
+             { label: "美食筆記 1", url: "https://xhslink.com/m/8nncgeJwxoU" },
+             { label: "美食筆記 2", url: "https://xhslink.com/m/8VWjThardWi" },
+             { label: "美食筆記 3", url: "https://xhslink.com/m/6iMd1FbX7v1" }
+          ]
         }
       ]
     },
@@ -198,27 +235,49 @@ export const initialTripData: Trip = {
         {
           id: "d5-1",
           type: ItineraryType.TRANSPORT,
-          time: "07:45",
-          name: "飛往那不勒斯",
-          location: "PMO Airport",
-          description: "EasyJet 航班。08:40 抵達那不勒斯。",
-          transportCode: "U2 2831",
-          terminal: "A",
-          gate: "A04",
-          status: "準點",
-          indoorMap: "https://www.aeroportodipalermo.it/en/airport-map/",
-          tips: ["行李限制: 隨身 45x36x20 15kg", "托運: 總長275cm 23kg"],
-          externalLinks: [{ label: "機場到市區攻略", url: "https://xhslink.com/m/6nYyU05ycRb" }]
+          time: "05:20",
+          name: "前往機場",
+          location: "Palermo Centrale",
+          description: "搭乘 REG 21703 前往機場 (06:05 抵達)。",
+          transportCode: "REG 21703",
+          status: "準點"
         },
         {
           id: "d5-2",
+          type: ItineraryType.TRANSPORT,
+          time: "07:45",
+          name: "飛往那不勒斯",
+          location: "PMO Airport",
+          description: "EasyJet EJU4102。08:40 抵達那不勒斯。",
+          transportCode: "EJU 4102",
+          status: "準點",
+          externalLinks: [{ label: "機場到市區攻略", url: "https://xhslink.com/m/6nYyU05ycRb" }]
+        },
+        {
+          id: "d5-3",
+          type: ItineraryType.ATTRACTION,
+          time: "10:30",
+          name: "那不勒斯 City Walk",
+          location: "Naples",
+          description: "探索披薩的故鄉。",
+          externalLinks: [{ label: "City Walk 攻略", url: "https://xhslink.com/m/ATd9HirB70T" }]
+        },
+        {
+            id: "d5-4",
+            type: ItineraryType.ATTRACTION,
+            time: "14:00",
+            name: "入住那不勒斯飯店",
+            location: "60 Vico Tre Re a Toledo",
+            description: "位於普萊比斯托區。每人4歐城市稅。",
+        },
+        {
+          id: "d5-5",
           type: ItineraryType.RESTAURANT,
-          time: "12:00",
+          time: "18:00",
           name: "那不勒斯美食",
           location: "Naples",
-          description: "披薩的故鄉，探索道地美食。",
+          description: "品嚐當地特色小吃與道地披薩。",
           externalLinks: [
-            { label: "City Walk 攻略", url: "https://xhslink.com/m/ATd9HirB70T" },
             { label: "美食推薦 1", url: "https://xhslink.com/m/8JenkioFdna" },
             { label: "美食推薦 2", url: "https://xhslink.com/m/9EYKwrhXdG9" }
           ]
@@ -241,13 +300,47 @@ export const initialTripData: Trip = {
       items: [
         {
           id: "d6-1",
+          type: ItineraryType.TRANSPORT,
+          time: "07:35",
+          name: "前往龐貝",
+          location: "Toledo -> Garibaldi -> Pompei",
+          description: "07:35 地鐵 L1 至 Garibaldi，轉乘 08:26 區間車 CE 至 Pompei Scavi。",
+          tips: ["備妥零錢"]
+        },
+        {
+          id: "d6-2",
           type: ItineraryType.ATTRACTION,
-          time: "09:00",
-          name: "龐貝古城與維蘇威火山",
+          time: "09:05",
+          name: "龐貝古城",
           location: "Pompeii",
           description: "參觀被火山灰掩埋的古羅馬城市。",
-          tips: ["務必提前購票"],
-          externalLinks: [{ label: "購票與參觀攻略", url: "https://xhslink.com/m/4AdmsWSM5cD" }]
+        },
+        {
+          id: "d6-3",
+          type: ItineraryType.ATTRACTION,
+          time: "13:00",
+          name: "維蘇威火山",
+          location: "Vesuvius",
+          description: "搭乘 EVA 808 巴士上山 (Villa dei Misteri 發車)。14:10-15:20 參觀火山。",
+          tips: ["13:00 巴士出發", "15:30 巴士回程"]
+        },
+        {
+            id: "d6-4",
+            type: ItineraryType.TRANSPORT,
+            time: "17:01",
+            name: "返回那不勒斯",
+            location: "Pompei -> Naples",
+            description: "搭乘 CE 返回 Garibaldi，轉乘地鐵回 Toledo。",
+        },
+        {
+          id: "d6-5",
+          type: ItineraryType.RESTAURANT,
+          time: "19:00",
+          name: "L'Antica Pizzeria Da Michele",
+          location: "Naples",
+          description: "世界知名的披薩名店。",
+          mustEat: ["Margherita", "Marinara"],
+          externalLinks: [{ label: "線上預訂", url: "https://www.damichele.net/" }]
         }
       ]
     },
@@ -268,27 +361,45 @@ export const initialTripData: Trip = {
         {
           id: "d7-1",
           type: ItineraryType.TRANSPORT,
-          time: "07:20",
+          time: "07:10",
           name: "巴士前往巴里",
-          location: "Napoli Centrale (Bus)",
-          description: "搭乘巴士前往 Bari (約 3h10m)。",
-          transportCode: "FLIXBUS 525",
-          platform: "Stallo 12",
-          status: "準點",
-          indoorMap: "https://www.google.com/maps/search/?api=1&query=Napoli+Centrale+Station+Map",
-          tips: ["票價約 525 TWD"]
+          location: "Naples Varco Immacolatella",
+          description: "搭乘巴士前往 Bari (10:40 抵達)。",
+          indoorMap: "https://maps.app.goo.gl/ewZP44CTFwCTmtYA6"
         },
         {
           id: "d7-2",
           type: ItineraryType.ATTRACTION,
-          time: "14:00",
+          time: "12:00",
           name: "阿爾貝羅貝洛 (蘑菇村)",
           location: "Alberobello",
-          description: "童話般的 Trulli 建築群。",
+          description: "12:00 出發前往蘑菇村，13:40 抵達。參觀 Trulli 建築群，17:00 返回。",
+          tips: ["Church of Saint Lucia 旁平台可看全景"],
           externalLinks: [
-             { label: "巴里-蘑菇村交通", url: "https://xhslink.com/m/26U32bleRap" },
-             { label: "住宿推薦", url: "https://xhslink.com/m/8LjAy0JjhLY" }
+             { label: "巴里-蘑菇村交通", url: "http://xhslink.com/o/6NADP7Yx5td" },
+             { label: "蘑菇村攻略", url: "http://xhslink.com/o/4oTlc1IkrKO" },
+             { label: "介紹", url: "https://yukigo.tw/post-46487457/" }
           ]
+        },
+        {
+            id: "d7-3",
+            type: ItineraryType.RESTAURANT,
+            time: "18:00",
+            name: "巴里晚餐",
+            location: "Bari",
+            description: "探索普利亞大區的海鮮料理。",
+            externalLinks: [
+                { label: "晚餐推薦 1", url: "http://xhslink.com/o/2zOD8rbNQsc" },
+                { label: "晚餐推薦 2", url: "http://xhslink.com/o/8yem54j6HiW" }
+            ]
+        },
+        {
+            id: "d7-4",
+            type: ItineraryType.ATTRACTION,
+            time: "20:00",
+            name: "入住巴里飯店",
+            location: "Corte S. Pietro Vecchio, Bari",
+            description: "位於 Bari 老城區。",
         }
       ]
     },
@@ -309,26 +420,39 @@ export const initialTripData: Trip = {
         {
           id: "d8-1",
           type: ItineraryType.TRANSPORT,
-          time: "13:55",
-          name: "飛往羅馬",
-          location: "BRI Airport",
-          description: "Ryanair 航班。15:05 抵達羅馬。",
-          transportCode: "FR 7892",
-          terminal: "1",
-          gate: "B06",
-          status: "準點",
-          indoorMap: "https://www.aeroportidipuglia.it/en/bari/mappa-aeroporto/",
-          tips: ["隨身: 40x25x20 10kg", "托運: 80x120x120 20kg"]
+          time: "08:40",
+          name: "前往羅馬",
+          location: "Bari Centrale",
+          description: "08:20 抵達車站，08:40 出發，13:15 抵達 Roma Termini。",
+          transportCode: "Train",
+          status: "準點"
         },
         {
           id: "d8-2",
           type: ItineraryType.ATTRACTION,
-          time: "16:00",
-          name: "羅馬 City Walk Part 1",
+          time: "13:30",
+          name: "入住羅馬飯店",
+          location: "Via Rimini, 14, Roma",
+          description: "位於聖喬瓦尼區。每人 4.5 歐城市稅。",
+          indoorMap: "https://maps.app.goo.gl/KLiMpCwJZQL9ah9r6"
+        },
+        {
+          id: "d8-3",
+          type: ItineraryType.ATTRACTION,
+          time: "14:00",
+          name: "羅馬 City Walk",
           location: "Rome",
-          description: "納沃納廣場、銀塔廣場、萬神殿周邊。",
-          mustEat: ["Giolitti 萬神殿冰淇淋", "Forno Campo de 'Fiori (鮮花廣場)", "L’Antico Forno (開心果可頌)"],
-          externalLinks: [{ label: "路線地圖", url: "https://maps.app.goo.gl/vL3DdqhwStoNHLRQ7" }]
+          description: "下午城市漫步，晚上夜拍羅馬競技場、特雷維噴泉、Gelato 巡禮。",
+          externalLinks: [{ label: "路線地圖", url: "https://maps.app.goo.gl/q6BZuBNZ1AEYBFsq8" }]
+        },
+        {
+            id: "d8-4",
+            type: ItineraryType.RESTAURANT,
+            time: "16:00",
+            name: "羅馬必吃麵包店",
+            location: "Rome",
+            mustEat: ["Forno Campo de 'Fiori (鮮花廣場)", "L’Antico Forno (特雷維噴泉旁)"],
+            description: "開心果可頌和巧克力可頌是招牌。"
         }
       ]
     },
@@ -348,12 +472,21 @@ export const initialTripData: Trip = {
       items: [
         {
           id: "d9-1",
+          type: ItineraryType.RESTAURANT,
+          time: "07:30",
+          name: "噴泉早餐",
+          location: "Trevi Fountain Area",
+          description: "享受羅馬的早晨。",
+        },
+        {
+          id: "d9-2",
           type: ItineraryType.ATTRACTION,
           time: "09:00",
-          name: "羅馬 City Walk Part 2",
-          location: "Rome",
-          description: "深入探索永恆之城。",
-          externalLinks: [{ label: "路線地圖", url: "https://maps.app.goo.gl/7hrbkDhNUazEMkBv5" }]
+          name: "梵諦岡聖門與 City Walk",
+          location: "Vatican & Rome",
+          description: "梵諦岡走聖門，接著逆著走的 City Walk。",
+          mustEat: ["Forno Roscioli Esquilino (Via Buonarroti, 46/48)"],
+          externalLinks: [{ label: "路線地圖 (逆行)", url: "https://maps.app.goo.gl/vL3DdqhwStoNHLRQ7" }]
         }
       ]
     },
@@ -373,26 +506,42 @@ export const initialTripData: Trip = {
       items: [
         {
           id: "d10-1",
-          type: ItineraryType.ATTRACTION,
-          time: "09:00",
-          name: "羅馬 City Walk Part 3",
-          location: "Rome",
-          description: "最後的羅馬巡禮。",
-          mustEat: ["Forno Roscioli Esquilino"],
-          externalLinks: [{ label: "路線地圖", url: "https://maps.app.goo.gl/qpx5BeM8fPACe4aF6" }]
+          type: ItineraryType.RESTAURANT,
+          time: "08:30",
+          name: "早餐: 奶油麵包",
+          location: "Regoli Pasticceria",
+          description: "好吃到併軌的奶油麵包。",
+          externalLinks: [{ label: "地圖位置", url: "https://maps.app.goo.gl/7Ft7DKYKXn16E2qT8" }]
         },
         {
           id: "d10-2",
           type: ItineraryType.TRANSPORT,
-          time: "13:35",
+          time: "09:35",
           name: "高鐵前往威尼斯",
-          location: "Roma Termini",
-          description: "搭乘高鐵前往水都威尼斯 (17:34 抵達)。",
-          transportCode: "Frecciarossa 9422",
-          platform: "Binario 8",
-          status: "準點",
-          indoorMap: "https://www.romatermini.com/en/map/",
-          tips: ["票價 2701 TWD/人"]
+          location: "Roma Termini -> Venice",
+          description: "09:35 出發，13:25 抵達威尼斯。",
+          transportCode: "Frecciarossa",
+          status: "準點"
+        },
+        {
+          id: "d10-3",
+          type: ItineraryType.ATTRACTION,
+          time: "14:00",
+          name: "入住威尼斯飯店",
+          location: "192 Via Aleardo Aleardi, Mestre",
+          description: "位於 Mestre。每人 4 歐城市稅。",
+        },
+        {
+          id: "d10-4",
+          type: ItineraryType.ATTRACTION,
+          time: "15:00",
+          name: "威尼斯 City Walk",
+          location: "Venice",
+          description: "聖馬可廣場看夕陽，晚餐享用墨魚麵。",
+          externalLinks: [
+              { label: "City Walk 地圖", url: "https://maps.app.goo.gl/TkvCdUqphnTFkWfg7" },
+              { label: "拍照機位", url: "http://xhslink.com/a/znJ2tBj2QF4Y" }
+          ]
         }
       ]
     },
@@ -413,27 +562,34 @@ export const initialTripData: Trip = {
         {
           id: "d11-1",
           type: ItineraryType.ATTRACTION,
-          time: "10:00",
-          name: "威尼斯 City Walk",
-          location: "Venice",
-          description: "聖馬可廣場看日落，穿梭水巷之間。",
-          externalLinks: [
-             { label: "地圖路線 1", url: "https://maps.app.goo.gl/N61kQn4ovpDJFQx57" },
-             { label: "地圖路線 2", url: "https://maps.app.goo.gl/cnBrrF7sG69MJnHG7" },
-             { label: "拍照機位", url: "http://xhslink.com/a/znJ2tBj2QF4Y" }
-          ]
+          time: "08:00",
+          name: "彩虹島 (Burano)",
+          location: "Burano",
+          description: "08:00-13:00 遊覽色彩繽紛的彩虹島。",
         },
         {
           id: "d11-2",
+          type: ItineraryType.ATTRACTION,
+          time: "14:00",
+          name: "本島 City Walk",
+          location: "Venice Main Island",
+          description: "逆著走的路線，學院橋拍照，準備跨年。",
+          externalLinks: [
+             { label: "路線地圖", url: "https://maps.app.goo.gl/cnBrrF7sG69MJnHG7" },
+             { label: "跨年攻略", url: "http://xhslink.com/o/8vIMGhCMODo" }
+          ]
+        },
+        {
+          id: "d11-3",
           type: ItineraryType.RESTAURANT,
           time: "18:00",
-          name: "威尼斯跨年晚餐",
+          name: "威尼斯必吃",
           location: "Venice",
-          description: "品嚐墨魚麵與在地小吃。",
+          description: "精選威尼斯街頭小吃與經典墨魚麵。",
           mustEat: ["佛洛里安咖啡店", "Acqua e Mais", "Fried Land", "墨魚麵"],
           externalLinks: [
-            { label: "墨魚麵推薦", url: "https://xhslink.com/m/3Byt85tyEBX" },
-            { label: "好吃清單", url: "https://xhslink.com/m/7TaiPQJ9Ppk" }
+              { label: "墨魚麵推薦", url: "https://xhslink.com/m/3Byt85tyEBX" },
+              { label: "好吃清單", url: "https://xhslink.com/m/7TaiPQJ9Ppk" }
           ]
         }
       ]
@@ -455,33 +611,39 @@ export const initialTripData: Trip = {
         {
           id: "d12-1",
           type: ItineraryType.ATTRACTION,
-          time: "10:00",
+          time: "09:00",
           name: "威尼斯晨間散步",
           location: "Venice",
-          description: "新年第一天的威尼斯。",
-          mustEat: ["Trattoria alla Rivetta (San Marco)"],
+          description: "Check-out 後寄放行李。最後的威尼斯漫步。",
           externalLinks: [{ label: "路線地圖", url: "https://maps.app.goo.gl/L2iG8JYmWzLfTuXV9" }]
         },
         {
           id: "d12-2",
-          type: ItineraryType.TRANSPORT,
-          time: "15:58",
-          name: "高鐵前往米蘭",
-          location: "Venice Santa Lucia",
-          description: "18:15 抵達米蘭。",
-          transportCode: "Frecciarossa 9748",
-          platform: "Binario 12",
-          status: "準點",
-          indoorMap: "https://www.veneziasantalucia.it/en/map/",
-          tips: ["票價 2068 TWD/人"]
+          type: ItineraryType.RESTAURANT,
+          time: "12:00",
+          name: "Trattoria alla Rivetta",
+          location: "San Marco",
+          description: "午餐推薦 (在小橋邊)。",
         },
         {
-           id: "d12-3",
+          id: "d12-3",
+          type: ItineraryType.TRANSPORT,
+          time: "15:18",
+          name: "高鐵前往米蘭",
+          location: "Venice -> Milan",
+          description: "15:18 出發，17:55 抵達米蘭。",
+          transportCode: "Frecciarossa",
+          status: "準點"
+        },
+        {
+           id: "d12-4",
            type: ItineraryType.ATTRACTION,
-           time: "19:00",
-           name: "米蘭市中心",
-           location: "Milan",
-           description: "米蘭大教堂、艾曼紐二世迴廊、商圈逛街。"
+           time: "18:10",
+           name: "入住米蘭飯店",
+           location: "Via Carpaccio, 3, Milan",
+           description: "Check-in 後夜遊米蘭大教堂、二世迴廊。",
+           mustEat: ["大教堂披薩餃"],
+           indoorMap: "https://maps.app.goo.gl/4JvwsZsYmVDiDDpW9"
         }
       ]
     },
@@ -502,11 +664,19 @@ export const initialTripData: Trip = {
         {
           id: "d13-1",
           type: ItineraryType.ATTRACTION,
-          time: "09:00",
+          time: "07:30",
           name: "瑞士盧加諾一日遊",
           location: "Lugano",
-          description: "跨越邊境前往瑞士湖畔城市盧加諾。",
+          description: "跨越邊境前往瑞士湖畔城市盧加諾。12:00 返回米蘭。",
           externalLinks: [{ label: "盧加諾攻略", url: "https://xhslink.com/m/2joDmdcGgnM" }]
+        },
+        {
+            id: "d13-2",
+            type: ItineraryType.ATTRACTION,
+            time: "14:00",
+            name: "米蘭人骨教堂",
+            location: "San Bernardino alle Ossa",
+            description: "參觀獨特的人骨教堂。",
         }
       ]
     },
@@ -527,7 +697,7 @@ export const initialTripData: Trip = {
         {
           id: "d14-1",
           type: ItineraryType.TRANSPORT,
-          time: "11:00",
+          time: "10:20",
           name: "抵達機場",
           location: "MXP",
           description: "12:10 起飛返回上海。",
@@ -548,7 +718,7 @@ export const initialTripData: Trip = {
         icon: "🏠",
         rainProb: "0%",
         uvIndex: "中 (5)",
-        outfitAdvice: "回到溫暖的家，短袖搭配薄外套即可。",
+        outfitAdvice: "回到溫暖的家。",
         sunProtection: "日常防曬。"
       },
       items: [
@@ -560,8 +730,7 @@ export const initialTripData: Trip = {
           location: "PVG",
           description: "等待轉機回台。",
           terminal: "T2",
-          status: "準點",
-          indoorMap: "https://www.shanghaiairport.com/cn/jcjt/index_53161.html"
+          status: "準點"
         },
         {
             id: "d15-2",
@@ -569,10 +738,9 @@ export const initialTripData: Trip = {
             time: "12:05",
             name: "飛往台灣",
             location: "PVG -> TPE",
-            description: "14:00 抵達溫暖的家。",
+            description: "14:00 抵達台灣。",
             transportCode: "CI 502",
             terminal: "T2",
-            gate: "D80",
             status: "準點",
         }
       ]

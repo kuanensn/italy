@@ -15,20 +15,24 @@ const UtilityHub: React.FC = () => {
   ] as const;
 
   const flights = [
-    { date: '12/21', from: 'TPE', to: 'PVG', airline: 'China Airlines', code: 'CI 075', time: '18:40', terminal: 'T2', gate: 'D5', baggage: '隨身 7kg, 托運 23kg' },
-    { date: '12/22', from: 'PVG', to: 'MXP', airline: 'ITA Airways', code: 'AZ 795', time: '01:20', terminal: 'T1', gate: '-', baggage: '隨身 8kg, 托運 23kg' },
-    { date: '12/22', from: 'MXP', to: 'PMO', airline: 'ITA Airways', code: '-', time: '10:30', terminal: '-', gate: '-', baggage: '隨身 15kg, 托運 23kg' },
-    { date: '12/25', from: 'PMO', to: 'NAP', airline: 'EasyJet', code: '-', time: '07:45', terminal: '-', gate: '-', baggage: '隨身 15kg, 托運 23kg' },
-    { date: '12/28', from: 'BRI', to: 'FCO', airline: 'Ryanair', code: '-', time: '13:55', terminal: '-', gate: '-', baggage: '隨身 10kg, 托運 20kg' },
-    { date: '1/3', from: 'MXP', to: 'PVG', airline: 'Air China', code: '-', time: '12:10', terminal: 'T1', gate: '-', baggage: '隨身 5kg, 托運 23kg' },
+    { date: '12/21', from: 'TPE', to: 'PVG', airline: 'China Eastern', code: 'MU 5006', time: '18:40', terminal: 'T2', gate: '-', baggage: '隨身 10kg, 托運 23kg' },
+    { date: '12/22', from: 'PVG', to: 'MXP', airline: 'China Eastern', code: 'MU 243', time: '01:20', terminal: 'T1', gate: '-', baggage: '隨身 10kg, 托運 23kg' },
+    { date: '12/22', from: 'MXP', to: 'PMO', airline: 'Ryanair', code: '-', time: '13:05', terminal: 'T1', gate: '-', baggage: '隨身 40x20x25' },
+    { date: '12/25', from: 'PMO', to: 'NAP', airline: 'EasyJet', code: 'EJU 4102', time: '07:45', terminal: '-', gate: '-', baggage: '隨身 45x36x20' },
+    { date: '12/28', from: 'BRI', to: 'ROM', airline: 'Train', code: '-', time: '08:40', terminal: 'Stazione', gate: '-', baggage: '無限制' },
+    { date: '12/30', from: 'ROM', to: 'VCE', airline: 'Frecciarossa', code: '-', time: '09:35', terminal: 'Termini', gate: '-', baggage: '無限制' },
+    { date: '1/1', from: 'VCE', to: 'MXP', airline: 'Frecciarossa', code: '-', time: '15:18', terminal: 'S.Lucia', gate: '-', baggage: '無限制' },
+    { date: '1/3', from: 'MXP', to: 'PVG', airline: 'Air China', code: 'CA 836', time: '12:10', terminal: 'T1', gate: '-', baggage: '隨身 5kg, 托運 23kg' },
+    { date: '1/4', from: 'PVG', to: 'TPE', airline: 'China Airlines', code: 'CI 502', time: '12:05', terminal: 'T2', gate: '-', baggage: '隨身 7kg, 托運 23kg' },
   ];
 
   const hotels = [
-      { name: 'Palermo Stay', location: 'Palermo, Sicily', dates: '12/22 - 12/24', type: '古城公寓' },
-      { name: 'Napoli Stay', location: 'Naples, Italy', dates: '12/25 - 12/27', type: '海景飯店' },
-      { name: 'Rome Stay', location: 'Rome, Italy', dates: '12/28 - 12/30', type: '歷史城區' },
-      { name: 'Venice Stay', location: 'Venice, Italy', dates: '12/30 - 1/1', type: '運河旁' },
-      { name: 'Milan Stay', location: 'Milan, Italy', dates: '1/1 - 1/3', type: '時尚區' },
+      { name: 'Palermo Hotel', location: 'P.za Giulio Cesare, 19, Palermo', dates: '12/22 - 12/25', type: '西西里島' },
+      { name: 'Napoli Hotel', location: '60 Vico Tre Re a Toledo, Naples', dates: '12/25 - 12/27', type: '那不勒斯' },
+      { name: 'Bari Hotel', location: 'Corte S. Pietro Vecchio, Bari', dates: '12/27 - 12/28', type: '普利亞' },
+      { name: 'Roma Hotel', location: 'Via Rimini, 14, Rome', dates: '12/28 - 12/30', type: '聖喬瓦尼區' },
+      { name: 'Venice Hotel', location: '192 Via Aleardo Aleardi, Mestre', dates: '12/30 - 1/1', type: '梅斯特' },
+      { name: 'Milan Hotel', location: 'Via Carpaccio, 3, Milan', dates: '1/1 - 1/3', type: '米蘭' },
   ];
 
   return (
@@ -126,13 +130,13 @@ const UtilityHub: React.FC = () => {
                          {/* Fake Image Gradient */}
                         <div className={`h-24 rounded-2xl bg-gradient-to-br ${idx % 2 === 0 ? 'from-orange-100 to-rose-100' : 'from-blue-100 to-indigo-100'} flex items-center justify-center relative overflow-hidden`}>
                              <BedDouble size={32} className="text-white/50 absolute -bottom-4 -right-4 rotate-12" />
-                             <span className="font-serif italic font-bold text-xl text-stone-800/60 z-10">{hotel.location.split(',')[0]}</span>
+                             <span className="font-serif italic font-bold text-xl text-stone-800/60 z-10">{hotel.type}</span>
                         </div>
                         <div className="p-4">
                             <div className="flex justify-between items-start mb-1">
-                                <h3 className="font-bold text-lg text-stone-800">{hotel.name}</h3>
-                                <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">{hotel.type}</span>
+                                <h3 className="font-bold text-lg text-stone-800 leading-tight">{hotel.name}</h3>
                             </div>
+                             <p className="text-xs text-stone-500 mb-2">{hotel.location}</p>
                             <p className="text-xs font-mono text-stone-400 mb-0">{hotel.dates}</p>
                         </div>
                     </div>

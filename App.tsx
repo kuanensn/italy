@@ -5,8 +5,8 @@ import UtilityHub from './components/UtilityHub';
 import TranslatorHub from './components/TranslatorHub';
 import { Trip, DayPlan } from './types';
 import { initialTripData } from './services/initialTripData';
-import { parseRawTextToItinerary, askTravelAssistant } from './services/geminiService';
-import { Map, Briefcase, Calendar, Loader2, Shirt, Umbrella, Sun, X, Droplets, Sparkles, ChevronRight, MessageCircle, Bot, Send, Languages, ArrowUp } from 'lucide-react';
+import { parseRawTextToItinerary, askTravelAssistant, identifyLocation } from './services/geminiService';
+import { Map, Briefcase, Calendar, Loader2, Shirt, Umbrella, Sun, X, Droplets, Sparkles, ChevronRight, MessageCircle, Bot, Send, Languages, ArrowUp, MapPin } from 'lucide-react';
 
 // --- Snow Effect Component ---
 const SnowEffect = () => {
@@ -56,6 +56,10 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [currentView, setCurrentView] = useState<'ITINERARY' | 'UTILITIES' | 'TRANSLATOR'>('ITINERARY');
   
+  // Location & Time State
+  const [originCity, setOriginCity] = useState('Taipei');
+  const [originTimezone, setOriginTimezone] = useState('Asia/Taipei');
+  
   // AI Assistant State
   const [showAiAssistant, setShowAiAssistant] = useState(false);
   const [aiMode, setAiMode] = useState<'CHAT' | 'IMPORT'>('CHAT');
@@ -79,16 +83,46 @@ const App: React.FC = () => {
   const dayRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // --- 1. Detect User Location on Mount ---
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+                // Use Gemini to identify city and timezone
+                const result = await identifyLocation(latitude, longitude);
+                if (result.city) setOriginCity(result.city);
+                if (result.timezone) setOriginTimezone(result.timezone);
+            } catch (e) {
+                console.error("Failed to identify location with Gemini", e);
+                // Fallback: Use browser's timezone
+                const sysTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                setOriginTimezone(sysTimezone);
+                setOriginCity(sysTimezone.split('/')[1] || 'Local');
+            }
+        }, (err) => {
+            console.warn("Geolocation permission denied or failed", err);
+            // Fallback: Use browser's timezone
+            const sysTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            setOriginTimezone(sysTimezone);
+            setOriginCity(sysTimezone.split('/')[1] || 'Local');
+        });
+    }
+  }, []);
+
+  // --- 2. Update Clocks ---
   useEffect(() => {
     const updateTime = () => {
         const now = new Date();
-        setTimeTPE(now.toLocaleTimeString('zh-TW', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hour12: false }));
+        // Origin Time (User's detected location)
+        setTimeTPE(now.toLocaleTimeString('zh-TW', { timeZone: originTimezone, hour: '2-digit', minute: '2-digit', hour12: false }));
+        // Destination Time (Fixed to Italy)
         setTimeROM(now.toLocaleTimeString('zh-TW', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false }));
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [originTimezone]);
 
   useEffect(() => {
       if (showAiAssistant && aiMode === 'CHAT') {
@@ -142,11 +176,11 @@ const App: React.FC = () => {
   const WeatherWidget = ({ weather }: { weather: DayPlan['weather'] }) => (
     <button 
         onClick={() => setSelectedWeather(weather)}
-        className="flex items-center gap-2 bg-white/60 backdrop-blur-md hover:bg-white/80 transition-colors px-3 py-1.5 rounded-full border border-white/50 shadow-sm ml-auto active:scale-95 group"
+        className="flex items-center gap-2 bg-white/60 backdrop-blur-md hover:bg-white/80 transition-colors px-3 py-1.5 rounded-full border border-stone-200 shadow-sm ml-auto active:scale-95 group shrink-0 ring-1 ring-stone-900/5"
     >
          <span className="text-xl drop-shadow-sm group-hover:scale-110 transition-transform">{weather.icon}</span>
          <div className="flex flex-col leading-none text-right">
-             <span className="text-sm font-serif font-bold text-slate-800">{weather.temp}</span>
+             <span className="text-sm font-serif font-bold text-stone-900">{weather.temp}</span>
          </div>
     </button>
   );
@@ -208,17 +242,17 @@ const App: React.FC = () => {
 
   return (
     // Main Container - Full Screen
-    <div className="min-h-screen w-full bg-[#f8f5f1] font-sans text-stone-800 relative">
+    <div className="min-h-screen w-full bg-[#f8f5f1] font-sans text-stone-900 relative">
       
         {/* --- Background Layers (Fixed) --- */}
-        {/* 1. Italian Sketch */}
+        {/* 1. Italian Scenery Photo */}
         <div 
-          className="fixed inset-0 z-0 opacity-15 pointer-events-none mix-blend-multiply"
+          className="fixed inset-0 z-0 opacity-20 pointer-events-none"
           style={{
-              backgroundImage: "url('https://img.freepik.com/free-vector/rome-landmarks-sketch-background_23-2147619106.jpg')",
+              backgroundImage: "url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1200&auto=format&fit=crop')",
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              filter: 'sepia(0.8) contrast(1.2)'
+              filter: 'sepia(0.2) contrast(1.1) brightness(1.1)'
           }}
         />
         {/* 2. Warm Gradient Orbs */}
@@ -234,21 +268,37 @@ const App: React.FC = () => {
         <div className="fixed top-0 left-0 right-0 z-40 w-full">
             <div className="max-w-lg mx-auto bg-gradient-to-b from-[#f8f5f1]/95 to-[#f8f5f1]/0 backdrop-blur-[2px]">
                 
-                {/* Large Dual Clock Vertical Layout (Replaces Title & Old Clock) */}
-                <div className="flex flex-col items-center justify-center pt-8 pb-4 gap-2">
-                    {/* Taipei Time (Origin) */}
-                    <div className="flex items-center gap-3 text-stone-400">
-                         <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Taipei</span>
-                         <span className="text-sm font-sans font-medium tracking-wider">{timeTPE}</span>
-                    </div>
+                {/* Large Dual Clock Vertical Layout */}
+                <div className="relative pt-8 pb-4">
                     
-                    {/* Decorative Divider */}
-                    <div className="w-8 h-[1px] bg-stone-300/40 my-1"></div>
+                    {/* Map Button (Absolute Right) - UPDATED */}
+                    <a 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trip?.destination || 'Italy')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="absolute right-5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 group z-10"
+                    >
+                         <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-xl border border-stone-200 shadow-lg flex items-center justify-center text-terracotta-700 group-hover:bg-terracotta-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ring-1 ring-black/5">
+                            <MapPin size={22} strokeWidth={2.5} />
+                        </div>
+                        <span className="text-[10px] font-black text-stone-600 uppercase tracking-widest group-hover:text-terracotta-700 transition-colors">Google Map</span>
+                    </a>
 
-                    {/* Rome Time (Destination) */}
-                    <div className="flex flex-col items-center">
-                        <span className="text-[3.5rem] leading-none font-serif italic font-black text-terracotta-800 tracking-tighter drop-shadow-sm">{timeROM}</span>
-                        <span className="text-xs font-bold text-terracotta-600 tracking-[0.4em] uppercase mt-2">Italy</span>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        {/* Origin Time (Detected Location) - UPDATED CONTRAST */}
+                        <div className="flex items-center gap-3 text-stone-600">
+                            <span className="text-[10px] font-black tracking-[0.2em] uppercase">{originCity}</span>
+                            <span className="text-sm font-sans font-bold tracking-wider">{timeTPE}</span>
+                        </div>
+                        
+                        {/* Decorative Divider */}
+                        <div className="w-8 h-[1.5px] bg-stone-400/60 my-1"></div>
+
+                        {/* Destination Time (Rome) */}
+                        <div className="flex flex-col items-center">
+                            <span className="text-[3.5rem] leading-none font-serif italic font-black text-terracotta-800 tracking-tighter drop-shadow-sm">{timeROM}</span>
+                            <span className="text-xs font-black text-terracotta-700 tracking-[0.4em] uppercase mt-2">Italy</span>
+                        </div>
                     </div>
                 </div>
 
@@ -261,9 +311,9 @@ const App: React.FC = () => {
                                 onClick={() => scrollToDay(day.day)}
                                 className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-24 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-md shadow-sm active:scale-95 transition-all hover:bg-white/60"
                             >
-                                <span className="text-xs font-bold text-stone-400 font-sans">{day.date?.split(' ')[0]}</span>
-                                <span className="text-2xl font-black text-stone-700 font-serif leading-none mt-1">{day.day}</span>
-                                <span className="text-[10px] font-bold text-terracotta-600 uppercase mt-1 truncate w-14 text-center">{day.location.split(' ')[0]}</span>
+                                <span className="text-xs font-bold text-stone-500 font-sans">{day.date?.split(' ')[0]}</span>
+                                <span className="text-2xl font-black text-stone-800 font-serif leading-none mt-1">{day.day}</span>
+                                <span className="text-[10px] font-bold text-terracotta-700 uppercase mt-1 truncate w-14 text-center">{day.location.split(' ')[0]}</span>
                             </button>
                         ))}
                         <div className="w-4 flex-shrink-0"></div>
@@ -355,22 +405,19 @@ const App: React.FC = () => {
                   className="scroll-mt-[20rem]"
                   ref={(el) => { dayRefs.current[dayPlan.day] = el }}
                 >
-                  {/* Day Divider */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex flex-col items-center">
-                          <span className="font-serif font-black text-4xl text-terracotta-800 leading-none italic">{dayPlan.day}</span>
-                          <span className="text-[9px] font-bold text-terracotta-400 uppercase tracking-widest">Day</span>
-                    </div>
-                    <div className="h-px flex-1 bg-gradient-to-r from-terracotta-200 to-transparent"></div>
-                    <div className="flex flex-col items-end">
-                        <h2 className="font-bold text-stone-800 text-lg">{dayPlan.location}</h2>
-                        <span className="text-xs text-stone-400 font-serif italic">{dayPlan.date}</span>
-                    </div>
+                  {/* Day Divider - High Contrast Update */}
+                  <div className="flex items-center gap-2 mb-6">
+                    <h2 className="flex items-center gap-2 font-serif font-bold text-lg text-stone-900 overflow-hidden">
+                        <span className="text-terracotta-800 whitespace-nowrap drop-shadow-sm">Day {dayPlan.day}</span>
+                        <span className="truncate text-stone-950">{dayPlan.location}</span>
+                        <span className="text-stone-600 whitespace-nowrap font-sans font-bold text-sm">{dayPlan.date}</span>
+                    </h2>
+                    <div className="h-[2px] flex-1 bg-stone-300 min-w-[10px]"></div>
                     <WeatherWidget weather={dayPlan.weather} />
                   </div>
 
                   {/* Timeline Container */}
-                  <div className="relative pl-4 border-l border-dashed border-stone-300 space-y-6">
+                  <div className="relative pl-4 border-l-2 border-dashed border-stone-300 space-y-6">
                       {dayPlan.items.map((item) => (
                           <ItineraryCard key={item.id} item={item} weather={dayPlan.weather} />
                       ))}
@@ -395,7 +442,7 @@ const App: React.FC = () => {
 
         {/* --- Floating Bottom Navigation (Fixed) --- */}
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full flex justify-center pointer-events-none">
-          <nav className="bg-stone-900/80 backdrop-blur-xl text-stone-300 px-2 py-2 rounded-full shadow-2xl flex items-center gap-1 border border-white/10 ring-1 ring-black/5 pointer-events-auto">
+          <nav className="bg-stone-900/90 backdrop-blur-xl text-stone-300 px-2 py-2 rounded-full shadow-2xl flex items-center gap-1 border border-white/10 ring-1 ring-black/10 pointer-events-auto">
               {[
                   { id: 'ITINERARY', icon: Map, label: '行程' },
                   { id: 'TRANSLATOR', icon: Languages, label: '翻譯' },
@@ -406,7 +453,7 @@ const App: React.FC = () => {
                       onClick={() => setCurrentView(item.id as any)}
                       className={`relative px-5 py-3 rounded-full transition-all duration-300 flex items-center gap-2 ${
                           currentView === item.id 
-                              ? 'bg-white text-stone-900 shadow-md translate-y-[-2px]' 
+                              ? 'bg-white text-stone-950 shadow-md translate-y-[-2px]' 
                               : 'hover:text-white hover:bg-white/10'
                       }`}
                   >

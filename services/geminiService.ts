@@ -229,3 +229,72 @@ export const translateText = async (text: string, direction: 'ZH_TO_IT' | 'IT_TO
   if (!response.text) return { translated: "翻譯失敗" };
   return JSON.parse(response.text);
 };
+
+export const translateImage = async (base64Image: string, direction: 'ZH_TO_IT' | 'IT_TO_ZH'): Promise<{ translated: string; pronunciation?: string; originalText?: string }> => {
+  const model = "gemini-2.5-flash";
+  const promptText = direction === 'ZH_TO_IT' 
+    ? `請辨識圖片中的中文文字，並翻譯成義大利文。請提供發音指引。` 
+    : `請辨識圖片中的義大利文文字，並翻譯成繁體中文。`;
+
+  // Gemini 2.5 Flash supports multimodal input directly
+  const response = await ai.models.generateContent({
+    model: model,
+    contents: {
+      parts: [
+        {
+          inlineData: {
+            mimeType: "image/jpeg",
+            data: base64Image
+          }
+        },
+        {
+          text: promptText
+        }
+      ]
+    },
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          originalText: { type: Type.STRING, description: "圖片中辨識出的原始文字" },
+          translated: { type: Type.STRING, description: "翻譯後的文字" },
+          pronunciation: { type: Type.STRING, description: "若為義大利文，請提供發音指引，若為中文則留空" }
+        }
+      }
+    }
+  });
+
+  if (!response.text) return { translated: "辨識失敗" };
+  return JSON.parse(response.text);
+};
+
+export const identifyLocation = async (lat: number, lng: number): Promise<{ city: string; timezone: string }> => {
+  const model = "gemini-2.5-flash";
+  const prompt = `
+    我現在的 GPS 座標是 Latitude: ${lat}, Longitude: ${lng}。
+    請根據此座標：
+    1. 告訴我所在的城市名稱（請用英文，例如 "Taipei", "Tokyo", "Rome"）。
+    2. 告訴我該地點的 IANA Timezone ID（例如 "Asia/Taipei", "Europe/Rome"）。
+    
+    請直接回傳 JSON。
+  `;
+
+  const response = await ai.models.generateContent({
+    model: model,
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+            city: { type: Type.STRING },
+            timezone: { type: Type.STRING }
+        }
+      }
+    }
+  });
+
+  if (!response.text) return { city: "Taipei", timezone: "Asia/Taipei" };
+  return JSON.parse(response.text);
+};
